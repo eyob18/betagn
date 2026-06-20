@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ቤት አግኝ · BetAgn</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Arial, sans-serif; background: #f5f5f5; }
+
+    .navbar {
+      background: white;
+      padding: 14px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #eee;
+    }
+    .logo { font-size: 20px; font-weight: bold; color: #1D9E75; }
+    .nav-btn {
+      background: #1D9E75;
+      color: white;
+      padding: 8px 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      text-decoration: none;
+    }
+
+    .hero {
+      background: #085041;
+      color: white;
+      text-align: center;
+      padding: 48px 24px;
+    }
+    .hero h1 { font-size: 28px; margin-bottom: 8px; }
+    .hero p { color: #9FE1CB; margin-bottom: 24px; }
+
+    .search-box {
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      max-width: 600px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .search-box select,
+    .search-box input {
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 14px;
+      width: 100%;
+    }
+    .search-btn {
+      grid-column: span 2;
+      background: #1D9E75;
+      color: white;
+      border: none;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 15px;
+      cursor: pointer;
+    }
+
+    .listings-section { padding: 24px; }
+    .listings-section h2 { margin-bottom: 16px; color: #333; }
+    .listings-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid #eee;
+    }
+    .card-img {
+      height: 160px;
+      background: #E1F5EE;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #aaa;
+      font-size: 14px;
+      position: relative;
+    }
+    .card-body { padding: 14px; }
+    .card-price { font-size: 20px; font-weight: bold; color: #111; }
+    .card-price span { font-size: 13px; font-weight: normal; color: #888; }
+    .card-title { color: #555; font-size: 14px; margin-top: 4px; }
+    .card-location { color: #999; font-size: 13px; margin-top: 4px; }
+    .card-meta {
+      display: flex;
+      gap: 12px;
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid #f0f0f0;
+      font-size: 12px;
+      color: #666;
+    }
+    .card-actions { display: flex; gap: 8px; margin-top: 12px; }
+    .btn-whatsapp {
+      flex: 1;
+      background: #25D366;
+      color: white;
+      border: none;
+      padding: 8px;
+      border-radius: 8px;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    .btn-view {
+      flex: 1;
+      background: white;
+      border: 1px solid #ddd;
+      padding: 8px;
+      border-radius: 8px;
+      font-size: 13px;
+      cursor: pointer;
+      color: #555;
+    }
+
+    .no-results {
+      text-align: center;
+      padding: 48px;
+      color: #888;
+    }
+    .no-results p { font-size: 16px; margin-top: 8px; }
+
+    .dots {
+      position: absolute;
+      bottom: 8px;
+      right: 8px;
+      display: flex;
+      gap: 4px;
+    }
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.5);
+      cursor: pointer;
+      border: 1px solid white;
+    }
+    .dot.active { background: white; }
+    .arrow {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(0,0,0,0.4);
+      color: white;
+      border: none;
+      width: 28px;
+      height: 40px;
+      border-radius: 4px;
+      font-size: 22px;
+      cursor: pointer;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+    }
+    .arrow:hover { background: rgba(0,0,0,0.7); }
+    .left-arrow { left: 6px; }
+    .right-arrow { right: 6px; }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation -->
+  <div class="navbar">
+    <div class="logo">ቤት አግኝ · BetAgn</div>
+    <a href="/add" class="nav-btn">+ Post listing</a>
+  </div>
+
+  <!-- Hero & Search -->
+  <div class="hero">
+    <h1>Find your home in Dire Dawa</h1>
+    <p>Apartments, houses and rooms — search by area and price</p>
+    <form class="search-box" method="GET" action="/">
+      <select name="neighborhood">
+        <option value="">All neighborhoods</option>
+        <option value="Kezira" {% if neighborhood == 'Kezira' %}selected{% endif %}>Kezira</option>
+        <option value="Sabian" {% if neighborhood == 'Sabian' %}selected{% endif %}>Sabian</option>
+        <option value="Legehare" {% if neighborhood == 'Legehare' %}selected{% endif %}>Legehare</option>
+        <option value="Gendekore" {% if neighborhood == 'Gendekore' %}selected{% endif %}>Gendekore</option>
+        <option value="Addis Ketema" {% if neighborhood == 'Addis Ketema' %}selected{% endif %}>Addis Ketema</option>
+        <option value="Melka Jebdu" {% if neighborhood == 'Melka Jebdu' %}selected{% endif %}>Melka Jebdu</option>
+      </select>
+      <select name="type">
+        <option value="">All property types</option>
+        <option value="Apartment" {% if property_type == 'Apartment' %}selected{% endif %}>Apartment</option>
+        <option value="House" {% if property_type == 'House' %}selected{% endif %}>House</option>
+        <option value="Room" {% if property_type == 'Room' %}selected{% endif %}>Room</option>
+        <option value="Villa" {% if property_type == 'Villa' %}selected{% endif %}>Villa</option>
+      </select>
+      <input type="number" name="max_price" placeholder="Max price in ETB"
+        value="{{ max_price }}">
+      <select name="bedrooms">
+        <option value="">Bedrooms</option>
+        <option value="1" {% if bedrooms == '1' %}selected{% endif %}>1</option>
+        <option value="2" {% if bedrooms == '2' %}selected{% endif %}>2</option>
+        <option value="3+" {% if bedrooms == '3+' %}selected{% endif %}>3+</option>
+      </select>
+      <button class="search-btn" type="submit">Search listings</button>
+    </form>
+  </div>
+
+  <!-- Listings -->
+  <div class="listings-section">
+    <h2>{{ total }} listing{{ 's' if total != 1 else '' }} found</h2>
+    <div class="listings-grid">
+
+      {% if listings %}
+        {% for listing in listings %}
+        {% set photos = listing.photo_urls if listing.get('photo_urls') else ([listing.photo_url] if listing.get('photo_url') else []) %}
+        <div class="card">
+          <div class="card-img" id="card-{{ loop.index0 }}">
+            {% if photos %}
+            <img src="{{ photos[0] }}"
+              alt="{{ listing.title }}"
+              style="width:100%; height:100%; object-fit:cover; cursor:pointer;"
+              onclick="openLightbox('{{ photos[0] }}')">
+            {% if photos|length > 1 %}
+            {% set card_id = 'card-' ~ loop.index0 %}
+            <button class="arrow left-arrow"
+              onclick="changePhoto('{{ card_id }}', -1)">&#8249;</button>
+            <button class="arrow right-arrow"
+              onclick="changePhoto('{{ card_id }}', 1)">&#8250;</button>
+            <div class="dots">
+              {% for url in photos %}
+              <div class="dot {% if loop.first %}active{% endif %}"
+                data-url="{{ url }}"
+                onclick="switchPhoto(this, '{{ url }}', '{{ card_id }}')">
+              </div>
+              {% endfor %}
+            </div>
+            {% endif %}
+            {% else %}
+            No photo yet
+            {% endif %}
+          </div>
+          <div class="card-body">
+            <div class="card-price">{{ listing.price }} ETB <span>/ month</span></div>
+            <div class="card-title">{{ listing.title }}</div>
+            <div class="card-location">📍 {{ listing.neighborhood }}, Dire Dawa</div>
+            <div class="card-meta">
+              <span>🛏 {{ listing.bedrooms }} bed</span>
+              <span>📐 {{ listing.size }}m²</span>
+            </div>
+            <div class="card-actions">
+              <a href="https://wa.me/251{{ listing.phone[1:] }}" target="_blank">
+                <button class="btn-whatsapp">📱 WhatsApp</button>
+              </a>
+              <button class="btn-view">View details</button>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      {% else %}
+        <div class="no-results">
+          <h3>No listings found</h3>
+          <p>Try changing your search filters</p>
+        </div>
+      {% endif %}
+
+    </div>
+  </div>
+
+  <!-- Lightbox -->
+  <div id="lightbox"
+    style="display:none; position:fixed; top:0; left:0; width:100%; height:100%;
+    background:rgba(0,0,0,0.9); z-index:1000; align-items:center;
+    justify-content:center;">
+    <!-- Close button -->
+    <div onclick="closeLightbox()"
+      style="position:absolute; top:16px; right:20px; color:white; font-size:32px;
+      cursor:pointer; line-height:1;">✕</div>
+    <!-- Left arrow -->
+    <div onclick="lightboxPrev()"
+      style="position:absolute; left:16px; color:white; font-size:56px;
+      cursor:pointer; user-select:none; line-height:1;">&#8249;</div>
+    <!-- Photo -->
+    <img id="lightbox-img" src="" alt="Property photo"
+      style="max-width:85%; max-height:85%; border-radius:8px; cursor:default;">
+    <!-- Right arrow -->
+    <div onclick="lightboxNext()"
+      style="position:absolute; right:16px; color:white; font-size:56px;
+      cursor:pointer; user-select:none; line-height:1;">&#8250;</div>
+    <!-- Dots -->
+    <div id="lightbox-dots"
+      style="position:absolute; bottom:20px; left:50%; transform:translateX(-50%);
+      display:flex; gap:8px;">
+    </div>
+  </div>
+
+  <script>
+    let currentPhotos = [];
+    let currentPhotoIndex = 0;
+
+    function openLightbox(urls, index) {
+      currentPhotos = urls;
+      currentPhotoIndex = index;
+      updateLightbox();
+      document.getElementById('lightbox').style.display = 'flex';
+    }
+
+    function updateLightbox() {
+      document.getElementById('lightbox-img').src = currentPhotos[currentPhotoIndex];
+      const dotsContainer = document.getElementById('lightbox-dots');
+      dotsContainer.innerHTML = '';
+      currentPhotos.forEach((url, i) => {
+        const dot = document.createElement('div');
+        dot.style.cssText = `width:10px; height:10px; border-radius:50%; cursor:pointer;
+          border:1px solid white;
+          background:${i === currentPhotoIndex ? 'white' : 'rgba(255,255,255,0.4)'};`;
+        dot.onclick = () => { currentPhotoIndex = i; updateLightbox(); };
+        dotsContainer.appendChild(dot);
+      });
+    }
+
+    function lightboxNext() {
+      currentPhotoIndex = (currentPhotoIndex + 1) % currentPhotos.length;
+      updateLightbox();
+    }
+
+    function lightboxPrev() {
+      currentPhotoIndex = (currentPhotoIndex - 1 + currentPhotos.length) % currentPhotos.length;
+      updateLightbox();
+    }
+
+    function closeLightbox() {
+      document.getElementById('lightbox').style.display = 'none';
+    }
+
+    // Close lightbox when clicking background
+    document.getElementById('lightbox').addEventListener('click', function(e) {
+      if (e.target === this) closeLightbox();
+    });
+
+    // Keyboard navigation
+    document.addEventListener('keydown', function(e) {
+      if (document.getElementById('lightbox').style.display === 'flex') {
+        if (e.key === 'ArrowRight') lightboxNext();
+        if (e.key === 'ArrowLeft') lightboxPrev();
+        if (e.key === 'Escape') closeLightbox();
+      }
+    });
+
+    function switchPhoto(dot, url, cardId) {
+      const card = document.getElementById(cardId);
+      card.querySelector('img').src = url;
+      const dots = card.querySelectorAll('.dot');
+      const urls = Array.from(dots).map(d => d.getAttribute('data-url'));
+      const index = Array.from(dots).indexOf(dot);
+      card.querySelector('img').onclick = function() { openLightbox(urls, index); };
+      card.querySelectorAll('.dot').forEach(d => d.classList.remove('active'));
+      dot.classList.add('active');
+    }
+
+    function changePhoto(cardId, direction) {
+      const card = document.getElementById(cardId);
+      const dots = card.querySelectorAll('.dot');
+      let activeIndex = 0;
+      dots.forEach((dot, i) => {
+        if (dot.classList.contains('active')) activeIndex = i;
+      });
+      let newIndex = activeIndex + direction;
+      if (newIndex < 0) newIndex = dots.length - 1;
+      if (newIndex >= dots.length) newIndex = 0;
+      const newDot = dots[newIndex];
+      const newUrl = newDot.getAttribute('data-url');
+      switchPhoto(newDot, newUrl, cardId);
+    }
+
+    // Set up lightbox on all card images on page load
+    document.addEventListener('DOMContentLoaded', function() {
+      document.querySelectorAll('.card-img').forEach(card => {
+        const img = card.querySelector('img');
+        if (!img) return;
+        const dots = card.querySelectorAll('.dot');
+        if (dots.length > 0) {
+          const urls = Array.from(dots).map(d => d.getAttribute('data-url'));
+          img.onclick = function() { openLightbox(urls, 0); };
+        } else {
+          const url = img.src;
+          img.onclick = function() { openLightbox([url], 0); };
+        }
+      });
+    });
+  </script>
+
+</body>
+</html>

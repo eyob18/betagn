@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Post a listing · BetAgn</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Arial, sans-serif; background: #f5f5f5; }
+
+    .navbar {
+      background: white;
+      padding: 14px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #eee;
+    }
+    .logo { font-size: 20px; font-weight: bold; color: #1D9E75; }
+    .back-btn {
+      background: white;
+      color: #1D9E75;
+      padding: 8px 16px;
+      border: 1px solid #1D9E75;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      text-decoration: none;
+    }
+
+    .form-container {
+      max-width: 600px;
+      margin: 32px auto;
+      background: white;
+      border-radius: 12px;
+      padding: 32px;
+      border: 1px solid #eee;
+    }
+
+    .form-container h1 {
+      font-size: 22px;
+      color: #111;
+      margin-bottom: 6px;
+    }
+    .form-container p {
+      color: #888;
+      font-size: 14px;
+      margin-bottom: 24px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 18px;
+    }
+    .form-group label {
+      font-size: 14px;
+      font-weight: bold;
+      color: #333;
+    }
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      padding: 10px 12px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 14px;
+      width: 100%;
+      font-family: Arial, sans-serif;
+    }
+    .form-group textarea {
+      height: 100px;
+      resize: vertical;
+    }
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: #1D9E75;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .hint {
+      font-size: 12px;
+      color: #999;
+    }
+
+    .submit-btn {
+      width: 100%;
+      background: #1D9E75;
+      color: white;
+      border: none;
+      padding: 14px;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      margin-top: 8px;
+    }
+    .submit-btn:hover { background: #085041; }
+
+    .success-banner {
+      background: #E1F5EE;
+      border: 1px solid #1D9E75;
+      color: #085041;
+      padding: 12px 16px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation -->
+  <div class="navbar">
+    <div class="logo">ቤት አግኝ · BetAgn</div>
+    <a href="/" class="back-btn">← Back to listings</a>
+  </div>
+
+  <!-- Form -->
+  <div class="form-container">
+    <h1>Post a listing</h1>
+    <p>Fill in your property details below. Renters will contact you directly on WhatsApp.</p>
+
+    {% if success %}
+    <div class="success-banner">
+      ✅ Your listing has been posted! <a href="/">View all listings</a>
+    </div>
+    {% endif %}
+
+    <form method="POST" action="/add" enctype="multipart/form-data">
+
+      <div class="form-group">
+        <label>Property title</label>
+        <input type="text" name="title" placeholder="e.g. 2-bedroom apartment in Kezira" required>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Property type</label>
+          <select name="type" required>
+            <option value="">Select type</option>
+            <option>Apartment</option>
+            <option>House</option>
+            <option>Room</option>
+            <option>Villa</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Neighborhood</label>
+          <select name="neighborhood" required>
+            <option value="">Select area</option>
+            <option>Kezira</option>
+            <option>Sabian</option>
+            <option>Legehare</option>
+            <option>Gendekore</option>
+            <option>Addis Ketema</option>
+            <option>Melka Jebdu</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Monthly rent (ETB)</label>
+          <input type="number" name="price" placeholder="e.g. 5000" required>
+        </div>
+        <div class="form-group">
+          <label>Size (m²)</label>
+          <input type="number" name="size" placeholder="e.g. 65">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Bedrooms</label>
+          <select name="bedrooms" required>
+            <option value="">Select</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4+</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Bathrooms</label>
+          <select name="bathrooms">
+            <option value="">Select</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3+</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Description</label>
+        <textarea name="description" placeholder="Describe the property — floor, furnishing, water supply, nearby landmarks..."></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>Property photos (up to 5)</label>
+        <input type="file" name="photos" accept="image/*" multiple>
+        <span class="hint">Hold Ctrl to select multiple photos at once</span>
+      </div>
+
+      <div class="form-group">
+        <label>Your WhatsApp number</label>
+
+      <div class="form-group">
+        <label>Your WhatsApp number</label>
+        <input type="text" name="phone" placeholder="e.g. 0912345678" required>
+        <span class="hint">Renters will contact you directly on this number</span>
+      </div>
+
+      <button type="submit" class="submit-btn">Post listing</button>
+
+    </form>
+  </div>
+
+</body>
+</html>
