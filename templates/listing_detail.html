@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ listing.title }} · BetAgn</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Arial, sans-serif; background: #EDECE8; color: #111; }
+
+    .navbar {
+      background: white;
+      padding: 14px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #eee;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .logo { font-size: 20px; font-weight: bold; color: #1D9E75; }
+    .back-btn {
+      color: #1D9E75;
+      font-size: 14px;
+      text-decoration: none;
+    }
+
+    /* Photo section */
+    .photo-section {
+      background: #2C2C2A;
+      position: relative;
+      width: 100%;
+    }
+    .main-photo {
+      width: 100%;
+      height: auto;
+      max-height: 320px;
+      object-fit: contain;
+      display: block;
+      cursor: pointer;
+    }
+    .no-photo {
+      width: 100%;
+      height: 260px;
+      background: #E1F5EE;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #aaa;
+      font-size: 16px;
+    }
+    .photo-counter {
+      position: absolute;
+      bottom: 12px;
+      right: 12px;
+      background: rgba(0,0,0,0.6);
+      color: white;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 13px;
+    }
+    .photo-arrow {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(0,0,0,0.4);
+      color: white;
+      border: none;
+      width: 36px;
+      height: 48px;
+      border-radius: 4px;
+      font-size: 24px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .photo-arrow:hover { background: rgba(0,0,0,0.7); }
+    .arrow-left { left: 12px; }
+    .arrow-right { right: 12px; }
+
+    .thumbnails {
+      display: flex;
+      gap: 6px;
+      padding: 8px 12px;
+      background: #3d3d3a;
+      overflow-x: auto;
+    }
+    .thumbnail {
+      width: 72px;
+      height: 52px;
+      object-fit: contain;
+      background: #333;
+      border-radius: 4px;
+      cursor: pointer;
+      opacity: 0.6;
+      flex-shrink: 0;
+      transition: opacity 0.2s;
+    }
+    .thumbnail.active { opacity: 1; border: 2px solid #1D9E75; }
+
+    /* Content */
+    .container {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 24px 16px 48px;
+    }
+
+    .price-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 6px;
+    }
+    .price { font-size: 28px; font-weight: bold; color: #111; }
+    .price span { font-size: 15px; font-weight: normal; color: #888; }
+    .property-type {
+      background: #E1F5EE;
+      color: #085041;
+      padding: 4px 12px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: bold;
+    }
+    .title { font-size: 18px; color: #333; margin-bottom: 4px; }
+    .location { color: #888; font-size: 14px; margin-bottom: 20px; }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .stat {
+      background: white;
+      border-radius: 10px;
+      padding: 14px;
+      text-align: center;
+      border: 1px solid #eee;
+    }
+    .stat-value { font-size: 20px; font-weight: bold; color: #111; }
+    .stat-label { font-size: 12px; color: #888; margin-top: 2px; }
+
+    .section {
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 14px;
+      border: 1px solid #eee;
+    }
+    .section h3 {
+      font-size: 15px;
+      color: #111;
+      margin-bottom: 10px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .section p { font-size: 14px; color: #555; line-height: 1.8; }
+
+    .contact-section {
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      border: 1px solid #eee;
+    }
+    .contact-section h3 { font-size: 15px; color: #111; margin-bottom: 10px; }
+    .phone-number { font-size: 24px; font-weight: bold; color: #1D9E75; }
+
+    /* Lightbox */
+    #lightbox {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.95);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+    #lightbox img {
+      max-width: 90%;
+      max-height: 90%;
+      object-fit: contain;
+      border-radius: 8px;
+    }
+    .lb-close {
+      position: absolute;
+      top: 16px; right: 20px;
+      color: white; font-size: 32px;
+      cursor: pointer;
+    }
+    .lb-arrow {
+      position: absolute;
+      color: white;
+      font-size: 56px;
+      cursor: pointer;
+      user-select: none;
+    }
+    .lb-prev { left: 16px; }
+    .lb-next { right: 16px; }
+    .lb-dots {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 8px;
+    }
+    .lb-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.4);
+      cursor: pointer;
+      border: 1px solid white;
+    }
+    .lb-dot.active { background: white; }
+  </style>
+</head>
+<body>
+
+  <div class="navbar">
+    <div class="logo">ቤት አግኝ · BetAgn</div>
+    <a href="/" class="back-btn">← Back</a>
+  </div>
+
+  <!-- Photos -->
+  {% if photos %}
+  <div class="photo-section">
+    <img id="main-photo" class="main-photo"
+      src="{{ photos[0] }}" alt="{{ listing.title }}"
+      onclick="openLightbox(0)">
+    {% if photos|length > 1 %}
+    <button class="photo-arrow arrow-left" onclick="prevPhoto()">&#8249;</button>
+    <button class="photo-arrow arrow-right" onclick="nextPhoto()">&#8250;</button>
+    <div class="photo-counter">
+      <span id="photo-num">1</span> / {{ photos|length }}
+    </div>
+    {% endif %}
+  </div>
+  {% if photos|length > 1 %}
+  <div class="thumbnails">
+    {% for url in photos %}
+    <img src="{{ url }}" class="thumbnail {% if loop.first %}active{% endif %}"
+      onclick="switchPhoto({{ loop.index0 }})">
+    {% endfor %}
+  </div>
+  {% endif %}
+  {% else %}
+  <div class="no-photo">No photos available</div>
+  {% endif %}
+
+  <div class="container">
+
+    <div style="margin-bottom: 20px; margin-top: 8px;">
+      <div class="price-row">
+        <div class="price">{{ listing.price }} ETB <span>/ month</span></div>
+        <div class="property-type">{{ listing.type }}</div>
+      </div>
+      <div class="title">{{ listing.title }}</div>
+      <div class="location">📍 {{ listing.neighborhood }}, Dire Dawa</div>
+    </div>
+
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-value">{{ listing.bedrooms }}</div>
+        <div class="stat-label">🛏 Bedrooms</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value">{{ listing.bathrooms }}</div>
+        <div class="stat-label">🚿 Bathrooms</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value">{{ listing.size }}m²</div>
+        <div class="stat-label">📐 Size</div>
+      </div>
+    </div>
+
+    {% if listing.description %}
+    <div class="section">
+      <h3>About this property</h3>
+      <p>{{ listing.description }}</p>
+    </div>
+    {% endif %}
+
+    <div class="contact-section">
+      <h3>Contact landlord</h3>
+      <div class="phone-number">{{ listing.phone }}</div>
+    </div>
+
+  </div>
+
+  <!-- Lightbox -->
+  <div id="lightbox">
+    <div class="lb-close" onclick="closeLightbox()">✕</div>
+    <div class="lb-arrow lb-prev" onclick="lightboxPrev()">&#8249;</div>
+    <img id="lightbox-img" src="" alt="Property photo">
+    <div class="lb-arrow lb-next" onclick="lightboxNext()">&#8250;</div>
+    <div class="lb-dots" id="lb-dots"></div>
+  </div>
+
+  <script>
+    const photos = {{ photos | tojson }};
+    let currentIndex = 0;
+
+    function switchPhoto(index) {
+      currentIndex = index;
+      document.getElementById('main-photo').src = photos[index];
+      const counter = document.getElementById('photo-num');
+      if (counter) counter.textContent = index + 1;
+      document.querySelectorAll('.thumbnail').forEach((t, i) => {
+        t.classList.toggle('active', i === index);
+      });
+    }
+
+    function nextPhoto() {
+      switchPhoto((currentIndex + 1) % photos.length);
+    }
+
+    function prevPhoto() {
+      switchPhoto((currentIndex - 1 + photos.length) % photos.length);
+    }
+
+    function openLightbox(index) {
+      currentIndex = index;
+      updateLightbox();
+      document.getElementById('lightbox').style.display = 'flex';
+    }
+
+    function closeLightbox() {
+      document.getElementById('lightbox').style.display = 'none';
+    }
+
+    function updateLightbox() {
+      document.getElementById('lightbox-img').src = photos[currentIndex];
+      const dots = document.getElementById('lb-dots');
+      dots.innerHTML = '';
+      photos.forEach((_, i) => {
+        const dot = document.createElement('div');
+        dot.className = 'lb-dot' + (i === currentIndex ? ' active' : '');
+        dot.onclick = () => { currentIndex = i; updateLightbox(); };
+        dots.appendChild(dot);
+      });
+    }
+
+    function lightboxNext() {
+      currentIndex = (currentIndex + 1) % photos.length;
+      updateLightbox();
+    }
+
+    function lightboxPrev() {
+      currentIndex = (currentIndex - 1 + photos.length) % photos.length;
+      updateLightbox();
+    }
+
+    document.getElementById('lightbox').addEventListener('click', function(e) {
+      if (e.target === this) closeLightbox();
+    });
+
+    document.addEventListener('keydown', function(e) {
+      if (document.getElementById('lightbox').style.display === 'flex') {
+        if (e.key === 'ArrowRight') lightboxNext();
+        if (e.key === 'ArrowLeft') lightboxPrev();
+        if (e.key === 'Escape') closeLightbox();
+      }
+    });
+  </script>
+
+</body>
+</html>

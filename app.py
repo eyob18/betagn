@@ -1,22 +1,23 @@
 import json
 import os
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request
 import firebase_admin
 from firebase_admin import credentials, firestore
 import cloudinary
 import cloudinary.uploader
 from dotenv import load_dotenv
 
-# Load secret keys from .env file (local development)
 load_dotenv()
 
-# Connect to Firebase
-firebase_key = json.loads(os.getenv('FIREBASE_KEY'))
-cred = credentials.Certificate(firebase_key)
+firebase_key_env = os.getenv('FIREBASE_KEY')
+if firebase_key_env:
+    firebase_key = json.loads(firebase_key_env)
+    cred = credentials.Certificate(firebase_key)
+else:
+    cred = credentials.Certificate('firebase_key.json')
 firebase_admin.initialize_app(cred)
 db = firestore.client()
 
-# Connect to Cloudinary
 cloudinary.config(
     cloud_name=os.getenv('CLOUDINARY_CLOUD_NAME'),
     api_key=os.getenv('CLOUDINARY_API_KEY'),
@@ -88,6 +89,16 @@ def add_listing():
         return render_template('add_listing.html', success=True)
 
     return render_template('add_listing.html', success=False)
+
+@app.route('/listing/<listing_id>')
+def listing_detail(listing_id):
+    doc = db.collection('listings').document(listing_id).get()
+    if not doc.exists:
+        return 'Listing not found', 404
+    listing = doc.to_dict()
+    listing['id'] = doc.id
+    photos = listing.get('photo_urls') or ([listing.get('photo_url')] if listing.get('photo_url') else [])
+    return render_template('listing_detail.html', listing=listing, photos=photos)
 
 if __name__ == '__main__':
     app.run(debug=True)
