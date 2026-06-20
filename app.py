@@ -9,8 +9,11 @@ import os
 # Load secret keys from .env file
 load_dotenv()
 
-# Connect to Firebase
-cred = credentials.Certificate('firebase_key.json')
+import json
+
+# Connect to Firebase using environment variable
+firebase_key = json.loads(os.getenv('FIREBASE_KEY'))
+cred = credentials.Certificate(firebase_key)
 firebase_admin.initialize_app(cred)
 db = firestore.client()
 
