@@ -1,17 +1,16 @@
+import json
+import os
 from flask import Flask, render_template, request, redirect, url_for
 import firebase_admin
 from firebase_admin import credentials, firestore
 import cloudinary
 import cloudinary.uploader
 from dotenv import load_dotenv
-import os
 
-# Load secret keys from .env file
+# Load secret keys from .env file (local development)
 load_dotenv()
 
-import json
-
-# Connect to Firebase using environment variable
+# Connect to Firebase
 firebase_key = json.loads(os.getenv('FIREBASE_KEY'))
 cred = credentials.Certificate(firebase_key)
 firebase_admin.initialize_app(cred)
@@ -33,28 +32,19 @@ def home():
     max_price = request.args.get('max_price', '')
     bedrooms = request.args.get('bedrooms', '')
 
-    # Get all listings from Firebase
     listings_ref = db.collection('listings').stream()
     listings = []
     for doc in listings_ref:
         listing = doc.to_dict()
         listing['id'] = doc.id
-        listing['id'] = doc.id
         listings.append(listing)
 
-    # Filter by neighborhood
     if neighborhood:
         listings = [l for l in listings if l.get('neighborhood') == neighborhood]
-
-    # Filter by property type
     if property_type:
         listings = [l for l in listings if l.get('type') == property_type]
-
-    # Filter by max price
     if max_price:
         listings = [l for l in listings if l.get('price', 0) <= int(max_price)]
-
-    # Filter by bedrooms
     if bedrooms:
         if bedrooms == '3+':
             listings = [l for l in listings if l.get('bedrooms', 0) >= 3]
@@ -73,11 +63,10 @@ def home():
 @app.route('/add', methods=['GET', 'POST'])
 def add_listing():
     if request.method == 'POST':
-        # Handle multiple photo uploads
         photo_urls = []
         if 'photos' in request.files:
             photos = request.files.getlist('photos')
-            for photo in photos[:5]:  # max 5 photos
+            for photo in photos[:5]:
                 if photo.filename != '':
                     result = cloudinary.uploader.upload(photo)
                     photo_urls.append(result['secure_url'])
@@ -95,7 +84,6 @@ def add_listing():
             'photo_urls': photo_urls
         }
 
-        # Save to Firebase
         db.collection('listings').add(new_listing)
         return render_template('add_listing.html', success=True)
 
