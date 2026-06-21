@@ -1,11 +1,12 @@
 import json
 import os
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect, url_for, session
 import firebase_admin
 from firebase_admin import credentials, firestore
 import cloudinary
 import cloudinary.uploader
 from dotenv import load_dotenv
+from werkzeug.security import generate_password_hash, check_password_hash
 
 load_dotenv()
 
@@ -25,6 +26,7 @@ cloudinary.config(
 )
 
 app = Flask(__name__)
+app.secret_key = os.getenv('SECRET_KEY', 'betagn2026secretkey')
 
 @app.route('/')
 def home():
@@ -58,11 +60,86 @@ def home():
         property_type=property_type,
         max_price=max_price,
         bedrooms=bedrooms,
-        total=len(listings)
+        total=len(listings),
+        user=session.get('user')
     )
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if session.get('user'):
+        return redirect(url_for('home'))
+
+    error = None
+    if request.method == 'POST':
+        email = request.form.get('email').lower().strip()
+        password = request.form.get('password')
+
+        users = db.collection('users').where('email', '==', email).stream()
+        user_doc = None
+        for u in users:
+            user_doc = u
+
+        if user_doc:
+            user_data = user_doc.to_dict()
+            if check_password_hash(user_data['password'], password):
+                session['user'] = {
+                    'uid': user_doc.id,
+                    'email': user_data['email'],
+                    'name': user_data.get('name', user_data['email'])
+                }
+                return redirect(url_for('home'))
+            else:
+                error = 'Incorrect password.'
+        else:
+            error = 'No account found with that email.'
+
+    return render_template('login.html', error=error, mode='login')
+
+@app.route('/signup', methods=['GET', 'POST'])
+def signup():
+    if session.get('user'):
+        return redirect(url_for('home'))
+
+    error = None
+    if request.method == 'POST':
+        email = request.form.get('email').lower().strip()
+        password = request.form.get('password')
+        name = request.form.get('name').strip()
+
+        # Check if email already exists
+        existing = db.collection('users').where('email', '==', email).stream()
+        if any(True for _ in existing):
+            error = 'An account with this email already exists.'
+        elif len(password) < 6:
+            error = 'Password must be at least 6 characters.'
+        else:
+            # Create new user
+            hashed = generate_password_hash(password)
+            new_user = {
+                'email': email,
+                'password': hashed,
+                'name': name
+            }
+            doc_ref = db.collection('users').add(new_user)
+            session['user'] = {
+                'uid': doc_ref[1].id,
+                'email': email,
+                'name': name
+            }
+            return redirect(url_for('home'))
+
+    return render_template('login.html', error=error, mode='signup')
+
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect(url_for('home'))
 
 @app.route('/add', methods=['GET', 'POST'])
 def add_listing():
+    if not session.get('user'):
+        return redirect(url_for('login'))
+
     if request.method == 'POST':
         photo_urls = []
         if 'photos' in request.files:
@@ -82,7 +159,8 @@ def add_listing():
             'bathrooms': int(request.form.get('bathrooms') or 1),
             'description': request.form.get('description'),
             'phone': request.form.get('phone'),
-            'photo_urls': photo_urls
+            'photo_urls': photo_urls,
+            'user_id': session['user']['uid']
         }
 
         db.collection('listings').add(new_listing)
@@ -98,7 +176,70 @@ def listing_detail(listing_id):
     listing = doc.to_dict()
     listing['id'] = doc.id
     photos = listing.get('photo_urls') or ([listing.get('photo_url')] if listing.get('photo_url') else [])
-    return render_template('listing_detail.html', listing=listing, photos=photos)
+    user = session.get('user')
+    is_owner = user and user['uid'] == listing.get('user_id')
+    return render_template('listing_detail.html',
+        listing=listing,
+        photos=photos,
+        is_owner=is_owner
+    )
+
+@app.route('/listing/<listing_id>/edit', methods=['GET', 'POST'])
+def edit_listing(listing_id):
+    if not session.get('user'):
+        return redirect(url_for('login'))
+    doc = db.collection('listings').document(listing_id).get()
+    if not doc.exists:
+        return 'Listing not found', 404
+    listing = doc.to_dict()
+    listing['id'] = doc.id
+    if listing.get('user_id') != session['user']['uid']:
+        return 'Not authorized', 403
+
+    if request.method == 'POST':
+        updated = {
+            'title': request.form.get('title'),
+            'type': request.form.get('type'),
+            'neighborhood': request.form.get('neighborhood'),
+            'price': int(request.form.get('price')),
+            'size': int(request.form.get('size') or 0),
+            'bedrooms': int(request.form.get('bedrooms')),
+            'bathrooms': int(request.form.get('bathrooms') or 1),
+            'description': request.form.get('description'),
+            'phone': request.form.get('phone'),
+        }
+        db.collection('listings').document(listing_id).update(updated)
+        return redirect(url_for('listing_detail', listing_id=listing_id))
+
+    return render_template('edit_listing.html', listing=listing)
+
+@app.route('/listing/<listing_id>/delete', methods=['POST'])
+def delete_listing(listing_id):
+    if not session.get('user'):
+        return redirect(url_for('login'))
+    doc = db.collection('listings').document(listing_id).get()
+    if not doc.exists:
+        return 'Listing not found', 404
+    listing = doc.to_dict()
+    if listing.get('user_id') != session['user']['uid']:
+        return 'Not authorized', 403
+    db.collection('listings').document(listing_id).delete()
+    return redirect(url_for('home'))
+
+@app.route('/profile')
+def profile():
+    if not session.get('user'):
+        return redirect(url_for('login'))
+    
+    user = session.get('user')
+    listings_ref = db.collection('listings').where('user_id', '==', user['uid']).stream()
+    listings = []
+    for doc in listings_ref:
+        listing = doc.to_dict()
+        listing['id'] = doc.id
+        listings.append(listing)
+    
+    return render_template('profile.html', user=user, listings=listings)
 
 if __name__ == '__main__':
     app.run(debug=True)

@@ -177,7 +177,33 @@
   <!-- Navigation -->
   <div class="navbar">
     <div class="logo">ቤት አግኝ · BetAgn</div>
-    <a href="/add" class="nav-btn">+ Post listing</a>
+    {% if user %}
+    <div style="display:flex; align-items:center; gap:10px;">
+      <a href="/profile" style="display:flex; align-items:center; gap:8px; text-decoration:none;">
+        <div style="width:32px; height:32px; border-radius:50%; background:#1D9E75;
+          display:flex; align-items:center; justify-content:center;
+          color:white; font-size:13px; font-weight:bold;">
+          {{ user.name[0].upper() }}
+        </div>
+        <span style="font-size:13px; color:#333; font-weight:500;">{{ user.name }}</span>
+      </a>
+      <a href="/add" class="nav-btn">+ Post listing</a>
+      <a href="/logout"
+        style="font-size:13px; color:#888; text-decoration:none;
+        border:1px solid #ddd; padding:6px 12px; border-radius:8px;">
+        Logout
+      </a>
+    </div>
+    {% else %}
+    <div style="display:flex; align-items:center; gap:8px;">
+      <a href="/login"
+        style="font-size:14px; color:#1D9E75; text-decoration:none;
+        border:1px solid #1D9E75; padding:7px 14px; border-radius:8px;">
+        Login
+      </a>
+      <a href="/signup" class="nav-btn">Sign up</a>
+    </div>
+    {% endif %}
   </div>
 
   <!-- Hero & Search -->

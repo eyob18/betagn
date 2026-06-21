@@ -288,6 +288,27 @@
       <div class="phone-number">{{ listing.phone }}</div>
     </div>
 
+    {% if is_owner %}
+    <div class="section" style="margin-top: 14px;">
+      <h3>Manage listing</h3>
+      <a href="/listing/{{ listing.id }}/edit"
+        style="display:block; width:100%; background:#1D9E75; color:white;
+        border:none; padding:12px; border-radius:8px; font-size:15px;
+        text-align:center; text-decoration:none; margin-bottom:10px;">
+        ✏️ Edit listing
+      </a>
+      <form method="POST" action="/listing/{{ listing.id }}/delete"
+        onsubmit="return confirm('Are you sure you want to delete this listing?')">
+        <button type="submit"
+          style="width:100%; background:white; color:#E24B4A;
+          border:1px solid #E24B4A; padding:12px; border-radius:8px;
+          font-size:15px; cursor:pointer;">
+          🗑️ Delete listing
+        </button>
+      </form>
+    </div>
+    {% endif %}
+
   </div>
 
   <!-- Lightbox -->
