@@ -82,13 +82,23 @@ def home():
         else:
             listings = [l for l in listings if l.get('bedrooms', 0) == int(bedrooms)]
 
+    total = len(listings)
+    per_page = 12
+    page = max(1, int(request.args.get('page', 1)))
+    total_pages = max(1, -(-total // per_page))  # ceiling division
+    page = min(page, total_pages)
+    start = (page - 1) * per_page
+    listings = listings[start:start + per_page]
+
     return render_template('index.html',
         listings=listings,
         neighborhood=neighborhood,
         property_type=property_type,
         max_price=max_price,
         bedrooms=bedrooms,
-        total=len(listings),
+        total=total,
+        page=page,
+        total_pages=total_pages,
         user=session.get('user')
     )
 

@@ -304,6 +304,46 @@
     </div>
   </div>
 
+  <!-- Pagination -->
+  {% if total_pages > 1 %}
+  <div style="display:flex; justify-content:center; align-items:center; gap:12px; padding:24px 16px 32px;">
+    {% set params = [] %}
+    {% if neighborhood %}{% set _ = params.append('neighborhood=' ~ neighborhood) %}{% endif %}
+    {% if property_type %}{% set _ = params.append('type=' ~ property_type) %}{% endif %}
+    {% if max_price %}{% set _ = params.append('max_price=' ~ max_price) %}{% endif %}
+    {% if bedrooms %}{% set _ = params.append('bedrooms=' ~ bedrooms) %}{% endif %}
+    {% set base_qs = params | join('&') %}
+
+    {% if page > 1 %}
+    <a href="/?{{ base_qs }}{% if base_qs %}&{% endif %}page={{ page - 1 }}"
+      style="padding:9px 20px; border:1px solid #ddd; border-radius:8px;
+      color:#333; text-decoration:none; font-size:14px; background:white;">
+      ← Prev
+    </a>
+    {% else %}
+    <span style="padding:9px 20px; border:1px solid #eee; border-radius:8px;
+      color:#ccc; font-size:14px; background:white; cursor:default;">
+      ← Prev
+    </span>
+    {% endif %}
+
+    <span style="font-size:14px; color:#888;">Page {{ page }} of {{ total_pages }}</span>
+
+    {% if page < total_pages %}
+    <a href="/?{{ base_qs }}{% if base_qs %}&{% endif %}page={{ page + 1 }}"
+      style="padding:9px 20px; border:1px solid #ddd; border-radius:8px;
+      color:#333; text-decoration:none; font-size:14px; background:white;">
+      Next →
+    </a>
+    {% else %}
+    <span style="padding:9px 20px; border:1px solid #eee; border-radius:8px;
+      color:#ccc; font-size:14px; background:white; cursor:default;">
+      Next →
+    </span>
+    {% endif %}
+  </div>
+  {% endif %}
+
   <!-- Lightbox -->
   <div id="lightbox"
     style="display:none; position:fixed; top:0; left:0; width:100%; height:100%;
