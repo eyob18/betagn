@@ -55,6 +55,21 @@ def time_ago_filter(dt):
 
 ADMIN_ID = 'hzeHSTreNf7Y0ivB4mpu'
 
+@app.route('/bookmark/<listing_id>', methods=['POST'])
+def toggle_bookmark(listing_id):
+    from flask import jsonify
+    if not session.get('user'):
+        return jsonify({'error': 'not logged in'}), 401
+    uid = session['user']['uid']
+    doc_id = f"{uid}_{listing_id}"
+    ref = db.collection('bookmarks').document(doc_id)
+    if ref.get().exists:
+        ref.delete()
+        return jsonify({'bookmarked': False})
+    else:
+        ref.set({'user_id': uid, 'listing_id': listing_id})
+        return jsonify({'bookmarked': True})
+
 @app.route('/')
 def home():
     neighborhood = request.args.get('neighborhood', '')
@@ -83,6 +98,13 @@ def home():
             listings = [l for l in listings if l.get('bedrooms', 0) == int(bedrooms)]
 
     total = len(listings)
+
+    bookmarked_ids = set()
+    if session.get('user'):
+        uid = session['user']['uid']
+        bm_refs = db.collection('bookmarks').where('user_id', '==', uid).stream()
+        bookmarked_ids = {bm.to_dict()['listing_id'] for bm in bm_refs}
+
     per_page = 12
     page = max(1, int(request.args.get('page', 1)))
     total_pages = max(1, -(-total // per_page))  # ceiling division
@@ -99,6 +121,7 @@ def home():
         total=total,
         page=page,
         total_pages=total_pages,
+        bookmarked_ids=bookmarked_ids,
         user=session.get('user')
     )
 
@@ -278,7 +301,17 @@ def profile():
         listing['id'] = doc.id
         listings.append(listing)
 
-    return render_template('profile.html', user=user, listings=listings)
+    bm_refs = db.collection('bookmarks').where('user_id', '==', user['uid']).stream()
+    saved_listings = []
+    for bm in bm_refs:
+        lid = bm.to_dict()['listing_id']
+        doc = db.collection('listings').document(lid).get()
+        if doc.exists:
+            l = doc.to_dict()
+            l['id'] = doc.id
+            saved_listings.append(l)
+
+    return render_template('profile.html', user=user, listings=listings, saved_listings=saved_listings)
 
 @app.route('/admin')
 def admin():

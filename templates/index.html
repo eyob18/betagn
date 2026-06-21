@@ -178,6 +178,20 @@
     .arrow:hover { background: rgba(0,0,0,0.7); }
     .left-arrow { left: 6px; }
     .right-arrow { right: 6px; }
+
+    .ribbon-btn {
+      position: absolute;
+      top: 0;
+      right: 10px;
+      width: 28px;
+      height: 40px;
+      cursor: pointer;
+      background: none;
+      border: none;
+      padding: 0;
+      z-index: 2;
+    }
+    .ribbon-btn svg { width: 28px; height: 40px; display: block; }
   </style>
 </head>
 <body>
@@ -252,6 +266,19 @@
         {% set photos = listing.photo_urls if listing.get('photo_urls') else ([listing.photo_url] if listing.get('photo_url') else []) %}
         <div class="card">
           <div class="card-img" id="card-{{ loop.index0 }}">
+            {% if user %}
+            {% set is_saved = listing.id in bookmarked_ids %}
+            <button class="ribbon-btn" id="ribbon-{{ listing.id }}"
+              onclick="toggleBookmark('{{ listing.id }}')" title="Save listing">
+              <svg viewBox="0 0 28 40" xmlns="http://www.w3.org/2000/svg">
+                <polygon id="ribbon-poly-{{ listing.id }}"
+                  points="0,0 28,0 28,40 14,28 0,40"
+                  fill="{{ '#1D9E75' if is_saved else 'white' }}"
+                  stroke="#1D9E75" stroke-width="2"
+                  style="transition: fill 0.2s;"/>
+              </svg>
+            </button>
+            {% endif %}
             {% if photos %}
             <img src="{{ photos[0] }}"
               alt="{{ listing.title }}"
@@ -432,6 +459,15 @@
       let newIndex = (activeIndex + 1) % dots.length;
       const newDot = dots[newIndex];
       switchPhoto(newDot, newDot.getAttribute('data-url'), cardId);
+    }
+
+    function toggleBookmark(listingId) {
+      fetch(`/bookmark/${listingId}`, { method: 'POST' })
+        .then(r => r.json())
+        .then(data => {
+          const poly = document.getElementById(`ribbon-poly-${listingId}`);
+          poly.setAttribute('fill', data.bookmarked ? '#1D9E75' : 'white');
+        });
     }
 
     function prevPhoto(cardId) {
