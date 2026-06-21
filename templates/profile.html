@@ -323,6 +323,7 @@
               <span>📍 {{ listing.neighborhood }}</span>
               <span>🛏 {{ listing.bedrooms }} bed</span>
               <span>{{ listing.type }}</span>
+              {% if listing.created_at %}<span>🕐 {{ listing.created_at | time_ago }}</span>{% endif %}
             </div>
           </div>
           <div class="listing-card-actions">

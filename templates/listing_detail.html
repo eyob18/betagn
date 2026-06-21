@@ -258,7 +258,9 @@
         <div class="property-type">{{ listing.type }}</div>
       </div>
       <div class="title">{{ listing.title }}</div>
-      <div class="location">📍 {{ listing.neighborhood }}, Dire Dawa</div>
+      <div class="location">📍 {{ listing.neighborhood }}, Dire Dawa
+        {% if listing.created_at %}<span style="font-size:12px; color:#bbb; margin-left:8px;">🕐 Posted {{ listing.created_at | time_ago }}</span>{% endif %}
+      </div>
     </div>
 
     <div class="stats">

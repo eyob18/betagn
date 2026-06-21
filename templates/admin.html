@@ -179,7 +179,7 @@
         <div class="listing-card-body">
           <div class="listing-card-price">{{ listing.price }} ETB <span>/ month</span></div>
           <div class="listing-card-title">{{ listing.title }}</div>
-          <div class="listing-card-location">📍 {{ listing.neighborhood }} · {{ listing.type }} · {{ listing.bedrooms }} bed</div>
+          <div class="listing-card-location">📍 {{ listing.neighborhood }} · {{ listing.type }} · {{ listing.bedrooms }} bed{% if listing.created_at %} · 🕐 {{ listing.created_at | time_ago }}{% endif %}</div>
           <div class="listing-card-actions">
             <a href="/listing/{{ listing.id }}" class="btn-view" target="_blank">View</a>
             <a href="/admin/edit/{{ listing.id }}" class="btn-view">✏️ Edit</a>
@@ -215,7 +215,7 @@
         <div class="listing-card-body">
           <div class="listing-card-price">{{ listing.price }} ETB <span>/ month</span></div>
           <div class="listing-card-title">{{ listing.title }}</div>
-          <div class="listing-card-location">📍 {{ listing.neighborhood }} · {{ listing.type }} · {{ listing.bedrooms }} bed</div>
+          <div class="listing-card-location">📍 {{ listing.neighborhood }} · {{ listing.type }} · {{ listing.bedrooms }} bed{% if listing.created_at %} · 🕐 {{ listing.created_at | time_ago }}{% endif %}</div>
           <div class="listing-card-actions">
             <a href="/listing/{{ listing.id }}" class="btn-view" target="_blank">View</a>
             <a href="/admin/edit/{{ listing.id }}" class="btn-view">✏️ Edit</a>
@@ -248,7 +248,7 @@
         <div class="listing-card-body">
           <div class="listing-card-price">{{ listing.price }} ETB <span>/ month</span></div>
           <div class="listing-card-title">{{ listing.title }}</div>
-          <div class="listing-card-location">📍 {{ listing.neighborhood }} · {{ listing.type }} · {{ listing.bedrooms }} bed</div>
+          <div class="listing-card-location">📍 {{ listing.neighborhood }} · {{ listing.type }} · {{ listing.bedrooms }} bed{% if listing.created_at %} · 🕐 {{ listing.created_at | time_ago }}{% endif %}</div>
           <div class="listing-card-actions">
             <a href="/listing/{{ listing.id }}" class="btn-view" target="_blank">View</a>
             <form method="POST" action="/admin/approve/{{ listing.id }}" style="display:inline;">

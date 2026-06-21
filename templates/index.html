@@ -278,6 +278,9 @@
             <div class="card-price">{{ listing.price }} ETB <span>/ month</span></div>
             <div class="card-title">{{ listing.title }}</div>
             <div class="card-location">📍 {{ listing.neighborhood }}, Dire Dawa</div>
+            {% if listing.created_at %}
+            <div style="font-size:12px; color:#bbb; margin-top:3px;">🕐 Posted {{ listing.created_at | time_ago }}</div>
+            {% endif %}
             <div class="card-meta">
               <span>🛏 {{ listing.bedrooms }} bed</span>
               <span>📐 {{ listing.size }}m²</span>

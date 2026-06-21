@@ -1,5 +1,6 @@
 import json
 import os
+from datetime import datetime, timezone
 from flask import Flask, render_template, request, redirect, url_for, session
 import firebase_admin
 from firebase_admin import credentials, firestore
@@ -27,6 +28,30 @@ cloudinary.config(
 
 app = Flask(__name__)
 app.secret_key = os.getenv('SECRET_KEY', 'betagn2026secretkey')
+
+@app.template_filter('time_ago')
+def time_ago_filter(dt):
+    if dt is None:
+        return ''
+    if hasattr(dt, 'tzinfo') and dt.tzinfo is None:
+        dt = dt.replace(tzinfo=timezone.utc)
+    now = datetime.now(timezone.utc)
+    diff = now - dt
+    days = diff.days
+    if days == 0:
+        return 'today'
+    if days == 1:
+        return 'yesterday'
+    if days < 7:
+        return f'{days} days ago'
+    if days < 30:
+        weeks = days // 7
+        return f'{weeks} week{"s" if weeks > 1 else ""} ago'
+    if days < 365:
+        months = days // 30
+        return f'{months} month{"s" if months > 1 else ""} ago'
+    years = days // 365
+    return f'{years} year{"s" if years > 1 else ""} ago'
 
 ADMIN_ID = 'hzeHSTreNf7Y0ivB4mpu'
 
@@ -162,7 +187,8 @@ def add_listing():
             'phone': request.form.get('phone'),
             'photo_urls': photo_urls,
             'user_id': session['user']['uid'],
-            'status': 'pending'
+            'status': 'pending',
+            'created_at': datetime.now(timezone.utc)
         }
 
         db.collection('listings').add(new_listing)
