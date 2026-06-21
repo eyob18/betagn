@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel · BetAgn</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Arial, sans-serif; background: #EDECE8; }
+
+    .navbar {
+      background: #085041;
+      padding: 14px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .logo { font-size: 20px; font-weight: bold; color: white; }
+    .back-btn { color: rgba(255,255,255,0.8); font-size: 14px; text-decoration: none; }
+
+    .container { max-width: 800px; margin: 24px auto; padding: 0 16px 48px; }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    .stat {
+      background: white;
+      border-radius: 12px;
+      padding: 16px;
+      text-align: center;
+      border: 1px solid #eee;
+    }
+    .stat-value { font-size: 28px; font-weight: bold; }
+    .stat-label { font-size: 12px; color: #888; margin-top: 4px; }
+    .stat.pending .stat-value { color: #BA7517; }
+    .stat.approved .stat-value { color: #1D9E75; }
+    .stat.rejected .stat-value { color: #E24B4A; }
+
+    .section-title {
+      font-size: 16px;
+      font-weight: bold;
+      color: #111;
+      margin-bottom: 12px;
+      margin-top: 24px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .badge {
+      padding: 2px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: normal;
+    }
+    .badge-pending { background: #FAEEDA; color: #BA7517; }
+    .badge-approved { background: #E1F5EE; color: #085041; }
+    .badge-rejected { background: #FCEBEB; color: #A32D2D; }
+
+    .listing-card {
+      background: white;
+      border-radius: 12px;
+      border: 1px solid #eee;
+      margin-bottom: 12px;
+      overflow: hidden;
+      display: flex;
+    }
+    .listing-card-img {
+      width: 110px;
+      min-height: 100px;
+      background: #E1F5EE;
+      flex-shrink: 0;
+      overflow: hidden;
+    }
+    .listing-card-img img {
+      width: 110px;
+      height: 100%;
+      object-fit: cover;
+    }
+    .listing-card-body {
+      padding: 14px;
+      flex: 1;
+    }
+    .listing-card-price { font-size: 17px; font-weight: bold; color: #111; }
+    .listing-card-price span { font-size: 12px; font-weight: normal; color: #888; }
+    .listing-card-title { font-size: 13px; color: #555; margin-top: 2px; }
+    .listing-card-location { font-size: 12px; color: #999; margin-top: 2px; }
+    .listing-card-actions { display: flex; gap: 8px; margin-top: 10px; }
+
+    .btn-approve {
+      background: #1D9E75;
+      color: white;
+      border: none;
+      padding: 7px 16px;
+      border-radius: 6px;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    .btn-reject {
+      background: white;
+      color: #E24B4A;
+      border: 1px solid #E24B4A;
+      padding: 7px 16px;
+      border-radius: 6px;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    .btn-view {
+      background: white;
+      color: #555;
+      border: 1px solid #ddd;
+      padding: 7px 16px;
+      border-radius: 6px;
+      font-size: 13px;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .status-badge {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      margin-left: 8px;
+    }
+
+    .empty {
+      background: white;
+      border-radius: 12px;
+      padding: 24px;
+      text-align: center;
+      color: #888;
+      font-size: 14px;
+      border: 1px solid #eee;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="navbar">
+    <div class="logo">BetAgn Admin</div>
+    <a href="/" class="back-btn">← View site</a>
+  </div>
+
+  <div class="container">
+
+    <!-- Stats -->
+    <div class="stats">
+      <div class="stat pending">
+        <div class="stat-value">{{ pending|length }}</div>
+        <div class="stat-label">Pending</div>
+      </div>
+      <div class="stat approved">
+        <div class="stat-value">{{ approved|length }}</div>
+        <div class="stat-label">Approved</div>
+      </div>
+      <div class="stat rejected">
+        <div class="stat-value">{{ rejected|length }}</div>
+        <div class="stat-label">Rejected</div>
+      </div>
+    </div>
+
+    <!-- Pending listings -->
+    <div class="section-title">
+      Pending review
+      <span class="badge badge-pending">{{ pending|length }}</span>
+    </div>
+
+    {% if pending %}
+      {% for listing in pending %}
+      {% set photos = listing.photo_urls if listing.get('photo_urls') else ([listing.photo_url] if listing.get('photo_url') else []) %}
+      <div class="listing-card">
+        <div class="listing-card-img">
+          {% if photos %}
+          <img src="{{ photos[0] }}" alt="{{ listing.title }}">
+          {% endif %}
+        </div>
+        <div class="listing-card-body">
+          <div class="listing-card-price">{{ listing.price }} ETB <span>/ month</span></div>
+          <div class="listing-card-title">{{ listing.title }}</div>
+          <div class="listing-card-location">📍 {{ listing.neighborhood }} · {{ listing.type }} · {{ listing.bedrooms }} bed</div>
+          <div class="listing-card-actions">
+            <a href="/listing/{{ listing.id }}" class="btn-view" target="_blank">View</a>
+            <a href="/admin/edit/{{ listing.id }}" class="btn-view">✏️ Edit</a>
+            <form method="POST" action="/admin/approve/{{ listing.id }}" style="display:inline;">
+              <button type="submit" class="btn-approve">✓ Approve</button>
+            </form>
+            <form method="POST" action="/admin/reject/{{ listing.id }}" style="display:inline;">
+              <button type="submit" class="btn-reject">✕ Reject</button>
+            </form>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    {% else %}
+      <div class="empty">No pending listings 🎉</div>
+    {% endif %}
+
+    <!-- Approved listings -->
+    <div class="section-title">
+      Approved
+      <span class="badge badge-approved">{{ approved|length }}</span>
+    </div>
+
+    {% if approved %}
+      {% for listing in approved %}
+      {% set photos = listing.photo_urls if listing.get('photo_urls') else ([listing.photo_url] if listing.get('photo_url') else []) %}
+      <div class="listing-card">
+        <div class="listing-card-img">
+          {% if photos %}
+          <img src="{{ photos[0] }}" alt="{{ listing.title }}">
+          {% endif %}
+        </div>
+        <div class="listing-card-body">
+          <div class="listing-card-price">{{ listing.price }} ETB <span>/ month</span></div>
+          <div class="listing-card-title">{{ listing.title }}</div>
+          <div class="listing-card-location">📍 {{ listing.neighborhood }} · {{ listing.type }} · {{ listing.bedrooms }} bed</div>
+          <div class="listing-card-actions">
+            <a href="/listing/{{ listing.id }}" class="btn-view" target="_blank">View</a>
+            <a href="/admin/edit/{{ listing.id }}" class="btn-view">✏️ Edit</a>
+            <form method="POST" action="/admin/reject/{{ listing.id }}" style="display:inline;">
+              <button type="submit" class="btn-reject">✕ Remove</button>
+            </form>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    {% else %}
+      <div class="empty">No approved listings yet</div>
+    {% endif %}
+
+    <!-- Rejected listings -->
+    <div class="section-title">
+      Rejected
+      <span class="badge badge-rejected">{{ rejected|length }}</span>
+    </div>
+
+    {% if rejected %}
+      {% for listing in rejected %}
+      {% set photos = listing.photo_urls if listing.get('photo_urls') else ([listing.photo_url] if listing.get('photo_url') else []) %}
+      <div class="listing-card">
+        <div class="listing-card-img">
+          {% if photos %}
+          <img src="{{ photos[0] }}" alt="{{ listing.title }}">
+          {% endif %}
+        </div>
+        <div class="listing-card-body">
+          <div class="listing-card-price">{{ listing.price }} ETB <span>/ month</span></div>
+          <div class="listing-card-title">{{ listing.title }}</div>
+          <div class="listing-card-location">📍 {{ listing.neighborhood }} · {{ listing.type }} · {{ listing.bedrooms }} bed</div>
+          <div class="listing-card-actions">
+            <a href="/listing/{{ listing.id }}" class="btn-view" target="_blank">View</a>
+            <form method="POST" action="/admin/approve/{{ listing.id }}" style="display:inline;">
+              <button type="submit" class="btn-approve">✓ Approve</button>
+            </form>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    {% else %}
+      <div class="empty">No rejected listings</div>
+    {% endif %}
+
+  </div>
+
+</body>
+</html>

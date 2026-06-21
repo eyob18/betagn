@@ -28,6 +28,8 @@ cloudinary.config(
 app = Flask(__name__)
 app.secret_key = os.getenv('SECRET_KEY', 'betagn2026secretkey')
 
+ADMIN_ID = 'hzeHSTreNf7Y0ivB4mpu'
+
 @app.route('/')
 def home():
     neighborhood = request.args.get('neighborhood', '')
@@ -40,7 +42,8 @@ def home():
     for doc in listings_ref:
         listing = doc.to_dict()
         listing['id'] = doc.id
-        listings.append(listing)
+        if listing.get('status') == 'approved':
+            listings.append(listing)
 
     if neighborhood:
         listings = [l for l in listings if l.get('neighborhood') == neighborhood]
@@ -106,14 +109,12 @@ def signup():
         password = request.form.get('password')
         name = request.form.get('name').strip()
 
-        # Check if email already exists
         existing = db.collection('users').where('email', '==', email).stream()
         if any(True for _ in existing):
             error = 'An account with this email already exists.'
         elif len(password) < 6:
             error = 'Password must be at least 6 characters.'
         else:
-            # Create new user
             hashed = generate_password_hash(password)
             new_user = {
                 'email': email,
@@ -160,7 +161,8 @@ def add_listing():
             'description': request.form.get('description'),
             'phone': request.form.get('phone'),
             'photo_urls': photo_urls,
-            'user_id': session['user']['uid']
+            'user_id': session['user']['uid'],
+            'status': 'pending'
         }
 
         db.collection('listings').add(new_listing)
@@ -207,6 +209,7 @@ def edit_listing(listing_id):
             'bathrooms': int(request.form.get('bathrooms') or 1),
             'description': request.form.get('description'),
             'phone': request.form.get('phone'),
+            'status': 'pending'
         }
         db.collection('listings').document(listing_id).update(updated)
         return redirect(url_for('listing_detail', listing_id=listing_id))
@@ -230,7 +233,7 @@ def delete_listing(listing_id):
 def profile():
     if not session.get('user'):
         return redirect(url_for('login'))
-    
+
     user = session.get('user')
     listings_ref = db.collection('listings').where('user_id', '==', user['uid']).stream()
     listings = []
@@ -238,8 +241,77 @@ def profile():
         listing = doc.to_dict()
         listing['id'] = doc.id
         listings.append(listing)
-    
+
     return render_template('profile.html', user=user, listings=listings)
+
+@app.route('/admin')
+def admin():
+    if not session.get('user') or session['user']['uid'] != ADMIN_ID:
+        return 'Not authorized', 403
+
+    pending = []
+    approved = []
+    rejected = []
+
+    listings_ref = db.collection('listings').stream()
+    for doc in listings_ref:
+        listing = doc.to_dict()
+        listing['id'] = doc.id
+        status = listing.get('status', 'pending')
+        if status == 'pending':
+            pending.append(listing)
+        elif status == 'approved':
+            approved.append(listing)
+        elif status == 'rejected':
+            rejected.append(listing)
+
+    return render_template('admin.html',
+        pending=pending,
+        approved=approved,
+        rejected=rejected,
+        user=session.get('user')
+    )
+
+@app.route('/admin/edit/<listing_id>', methods=['GET', 'POST'])
+def admin_edit_listing(listing_id):
+    if not session.get('user') or session['user']['uid'] != ADMIN_ID:
+        return 'Not authorized', 403
+    doc = db.collection('listings').document(listing_id).get()
+    if not doc.exists:
+        return 'Listing not found', 404
+    listing = doc.to_dict()
+    listing['id'] = doc.id
+
+    if request.method == 'POST':
+        updated = {
+            'title': request.form.get('title'),
+            'type': request.form.get('type'),
+            'neighborhood': request.form.get('neighborhood'),
+            'price': int(request.form.get('price')),
+            'size': int(request.form.get('size') or 0),
+            'bedrooms': int(request.form.get('bedrooms')),
+            'bathrooms': int(request.form.get('bathrooms') or 1),
+            'description': request.form.get('description'),
+            'phone': request.form.get('phone'),
+        }
+        db.collection('listings').document(listing_id).update(updated)
+        return redirect(url_for('admin'))
+
+    return render_template('admin_edit.html', listing=listing)
+
+@app.route('/admin/approve/<listing_id>', methods=['POST'])
+def approve_listing(listing_id):
+    if not session.get('user') or session['user']['uid'] != ADMIN_ID:
+        return 'Not authorized', 403
+    db.collection('listings').document(listing_id).update({'status': 'approved'})
+    return redirect(url_for('admin'))
+
+@app.route('/admin/reject/<listing_id>', methods=['POST'])
+def reject_listing(listing_id):
+    if not session.get('user') or session['user']['uid'] != ADMIN_ID:
+        return 'Not authorized', 403
+    db.collection('listings').document(listing_id).update({'status': 'rejected'})
+    return redirect(url_for('admin'))
 
 if __name__ == '__main__':
     app.run(debug=True)
