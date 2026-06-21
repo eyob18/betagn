@@ -10,22 +10,28 @@
 
     .navbar {
       background: white;
-      padding: 14px 24px;
+      padding: 14px 16px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       border-bottom: 1px solid #eee;
     }
     .logo { font-size: 20px; font-weight: bold; color: #1D9E75; }
+    .nav-right { display: flex; align-items: center; gap: 8px; }
+    .nav-name { font-size: 13px; color: #333; font-weight: 500; }
     .nav-btn {
       background: #1D9E75;
       color: white;
-      padding: 8px 16px;
+      padding: 7px 14px;
       border: none;
       border-radius: 8px;
       cursor: pointer;
       font-size: 14px;
       text-decoration: none;
+    }
+    @media (max-width: 480px) {
+      .nav-name { display: none; }
+      .nav-btn { padding: 7px 10px; font-size: 13px; }
     }
 
     .hero {
@@ -124,6 +130,10 @@
       font-size: 13px;
       cursor: pointer;
       color: #555;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
     }
 
     .no-results {
@@ -131,7 +141,6 @@
       padding: 48px;
       color: #888;
     }
-    .no-results p { font-size: 16px; margin-top: 8px; }
 
     .dots {
       position: absolute;
@@ -149,6 +158,7 @@
       border: 1px solid white;
     }
     .dot.active { background: white; }
+
     .arrow {
       position: absolute;
       top: 50%;
@@ -161,11 +171,9 @@
       border-radius: 4px;
       font-size: 22px;
       cursor: pointer;
-      z-index: 10;
       display: flex;
       align-items: center;
       justify-content: center;
-      line-height: 1;
     }
     .arrow:hover { background: rgba(0,0,0,0.7); }
     .left-arrow { left: 6px; }
@@ -178,27 +186,27 @@
   <div class="navbar">
     <div class="logo">ቤት አግኝ · BetAgn</div>
     {% if user %}
-    <div style="display:flex; align-items:center; gap:10px;">
-      <a href="/profile" style="display:flex; align-items:center; gap:8px; text-decoration:none;">
+    <div class="nav-right">
+      <a href="/profile" style="display:flex; align-items:center; gap:6px; text-decoration:none;">
         <div style="width:32px; height:32px; border-radius:50%; background:#1D9E75;
           display:flex; align-items:center; justify-content:center;
-          color:white; font-size:13px; font-weight:bold;">
+          color:white; font-size:13px; font-weight:bold; flex-shrink:0;">
           {{ user.name[0].upper() }}
         </div>
-        <span style="font-size:13px; color:#333; font-weight:500;">{{ user.name }}</span>
+        <span class="nav-name">{{ user.name }}</span>
       </a>
-      <a href="/add" class="nav-btn">+ Post listing</a>
+      <a href="/add" class="nav-btn">+ Post</a>
       <a href="/logout"
         style="font-size:13px; color:#888; text-decoration:none;
-        border:1px solid #ddd; padding:6px 12px; border-radius:8px;">
+        border:1px solid #ddd; padding:6px 10px; border-radius:8px;">
         Logout
       </a>
     </div>
     {% else %}
-    <div style="display:flex; align-items:center; gap:8px;">
+    <div class="nav-right">
       <a href="/login"
         style="font-size:14px; color:#1D9E75; text-decoration:none;
-        border:1px solid #1D9E75; padding:7px 14px; border-radius:8px;">
+        border:1px solid #1D9E75; padding:7px 12px; border-radius:8px;">
         Login
       </a>
       <a href="/signup" class="nav-btn">Sign up</a>
@@ -227,8 +235,7 @@
         <option value="Room" {% if property_type == 'Room' %}selected{% endif %}>Room</option>
         <option value="Villa" {% if property_type == 'Villa' %}selected{% endif %}>Villa</option>
       </select>
-      <input type="number" name="max_price" placeholder="Max price in ETB"
-        value="{{ max_price }}">
+      <input type="number" name="max_price" placeholder="Max price in ETB" value="{{ max_price }}">
       <select name="bedrooms">
         <option value="">Bedrooms</option>
         <option value="1" {% if bedrooms == '1' %}selected{% endif %}>1</option>
@@ -253,13 +260,11 @@
             <img src="{{ photos[0] }}"
               alt="{{ listing.title }}"
               style="width:100%; height:100%; object-fit:cover; cursor:pointer;"
-              onclick="openLightbox('{{ photos[0] }}')">
+              onclick="openLightbox({{ photos | tojson }}, 0)">
             {% if photos|length > 1 %}
             {% set card_id = 'card-' ~ loop.index0 %}
-            <button class="arrow left-arrow"
-              onclick="changePhoto('{{ card_id }}', -1)">&#8249;</button>
-            <button class="arrow right-arrow"
-              onclick="changePhoto('{{ card_id }}', 1)">&#8250;</button>
+            <button class="arrow left-arrow" onclick="prevPhoto('{{ card_id }}')">&#8249;</button>
+            <button class="arrow right-arrow" onclick="nextPhoto('{{ card_id }}')">&#8250;</button>
             <div class="dots">
               {% for url in photos %}
               <div class="dot {% if loop.first %}active{% endif %}"
@@ -285,7 +290,7 @@
               <a href="https://wa.me/251{{ listing.phone[1:] }}" target="_blank">
                 <button class="btn-whatsapp">📱 WhatsApp</button>
               </a>
-              <a href="/listing/{{ listing.id }}" class="btn-view" style="display:flex; align-items:center; justify-content:center; text-decoration:none;">View details</a>
+              <a href="/listing/{{ listing.id }}" class="btn-view">View details</a>
             </div>
           </div>
         </div>
@@ -305,22 +310,17 @@
     style="display:none; position:fixed; top:0; left:0; width:100%; height:100%;
     background:rgba(0,0,0,0.9); z-index:1000; align-items:center;
     justify-content:center;">
-    <!-- Close button -->
     <div onclick="closeLightbox()"
       style="position:absolute; top:16px; right:20px; color:white; font-size:32px;
-      cursor:pointer; line-height:1;">✕</div>
-    <!-- Left arrow -->
+      cursor:pointer;">✕</div>
     <div onclick="lightboxPrev()"
       style="position:absolute; left:16px; color:white; font-size:56px;
-      cursor:pointer; user-select:none; line-height:1;">&#8249;</div>
-    <!-- Photo -->
+      cursor:pointer; user-select:none;">&#8249;</div>
     <img id="lightbox-img" src="" alt="Property photo"
-      style="max-width:85%; max-height:85%; border-radius:8px; cursor:default;">
-    <!-- Right arrow -->
+      style="max-width:85%; max-height:85%; border-radius:8px;">
     <div onclick="lightboxNext()"
       style="position:absolute; right:16px; color:white; font-size:56px;
-      cursor:pointer; user-select:none; line-height:1;">&#8250;</div>
-    <!-- Dots -->
+      cursor:pointer; user-select:none;">&#8250;</div>
     <div id="lightbox-dots"
       style="position:absolute; bottom:20px; left:50%; transform:translateX(-50%);
       display:flex; gap:8px;">
@@ -366,12 +366,10 @@
       document.getElementById('lightbox').style.display = 'none';
     }
 
-    // Close lightbox when clicking background
     document.getElementById('lightbox').addEventListener('click', function(e) {
       if (e.target === this) closeLightbox();
     });
 
-    // Keyboard navigation
     document.addEventListener('keydown', function(e) {
       if (document.getElementById('lightbox').style.display === 'flex') {
         if (e.key === 'ArrowRight') lightboxNext();
@@ -383,44 +381,29 @@
     function switchPhoto(dot, url, cardId) {
       const card = document.getElementById(cardId);
       card.querySelector('img').src = url;
-      const dots = card.querySelectorAll('.dot');
-      const urls = Array.from(dots).map(d => d.getAttribute('data-url'));
-      const index = Array.from(dots).indexOf(dot);
-      card.querySelector('img').onclick = function() { openLightbox(urls, index); };
       card.querySelectorAll('.dot').forEach(d => d.classList.remove('active'));
       dot.classList.add('active');
     }
 
-    function changePhoto(cardId, direction) {
+    function nextPhoto(cardId) {
       const card = document.getElementById(cardId);
       const dots = card.querySelectorAll('.dot');
       let activeIndex = 0;
-      dots.forEach((dot, i) => {
-        if (dot.classList.contains('active')) activeIndex = i;
-      });
-      let newIndex = activeIndex + direction;
-      if (newIndex < 0) newIndex = dots.length - 1;
-      if (newIndex >= dots.length) newIndex = 0;
+      dots.forEach((dot, i) => { if (dot.classList.contains('active')) activeIndex = i; });
+      let newIndex = (activeIndex + 1) % dots.length;
       const newDot = dots[newIndex];
-      const newUrl = newDot.getAttribute('data-url');
-      switchPhoto(newDot, newUrl, cardId);
+      switchPhoto(newDot, newDot.getAttribute('data-url'), cardId);
     }
 
-    // Set up lightbox on all card images on page load
-    document.addEventListener('DOMContentLoaded', function() {
-      document.querySelectorAll('.card-img').forEach(card => {
-        const img = card.querySelector('img');
-        if (!img) return;
-        const dots = card.querySelectorAll('.dot');
-        if (dots.length > 0) {
-          const urls = Array.from(dots).map(d => d.getAttribute('data-url'));
-          img.onclick = function() { openLightbox(urls, 0); };
-        } else {
-          const url = img.src;
-          img.onclick = function() { openLightbox([url], 0); };
-        }
-      });
-    });
+    function prevPhoto(cardId) {
+      const card = document.getElementById(cardId);
+      const dots = card.querySelectorAll('.dot');
+      let activeIndex = 0;
+      dots.forEach((dot, i) => { if (dot.classList.contains('active')) activeIndex = i; });
+      let newIndex = (activeIndex - 1 + dots.length) % dots.length;
+      const newDot = dots[newIndex];
+      switchPhoto(newDot, newDot.getAttribute('data-url'), cardId);
+    }
   </script>
 
 </body>
