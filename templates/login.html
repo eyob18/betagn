@@ -5,87 +5,62 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{% if mode == 'signup' %}Sign up{% else %}Login{% endif %} · BetAgn</title>
   <style>
+    :root {
+      --green: #15A17D; --green-dark: #0C6B52; --green-light: #E6F7F2;
+      --bg: #F7F6F3; --surface: #FFFFFF; --border: #E8EAed;
+      --text: #111827; --muted: #6B7280; --faint: #9CA3AF;
+      --shadow: 0 2px 12px rgba(0,0,0,0.07); --r: 14px;
+    }
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: Arial, sans-serif; background: #EDECE8; min-height: 100vh; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); -webkit-font-smoothing: antialiased; min-height: 100vh; }
 
     .navbar {
-      background: white;
-      padding: 14px 24px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 1px solid #eee;
+      background: var(--surface); padding: 0 24px; height: 62px;
+      display: flex; align-items: center; justify-content: space-between;
+      border-bottom: 1px solid var(--border);
     }
-    .logo { font-size: 20px; font-weight: bold; color: #1D9E75; }
-    .back-btn { color: #1D9E75; font-size: 14px; text-decoration: none; }
+    .logo { font-size: 17px; font-weight: 700; color: var(--green); letter-spacing: -0.01em; text-decoration: none; }
+    .back-btn { font-size: 14px; color: var(--muted); text-decoration: none; font-weight: 500; }
+    .back-btn:hover { color: var(--green); }
 
-    .container {
-      max-width: 420px;
-      margin: 48px auto;
-      padding: 0 16px;
-    }
+    .container { max-width: 420px; margin: 52px auto; padding: 0 16px; }
 
-    .card {
-      background: white;
-      border-radius: 12px;
-      padding: 32px;
-      border: 1px solid #eee;
-    }
+    .card { background: var(--surface); border-radius: var(--r); padding: 36px 32px; box-shadow: var(--shadow); }
 
-    .card h1 { font-size: 22px; color: #111; margin-bottom: 6px; }
-    .card p { font-size: 14px; color: #888; margin-bottom: 24px; }
+    .card-header { margin-bottom: 28px; }
+    .card-header h1 { font-size: 24px; font-weight: 700; color: var(--text); letter-spacing: -0.02em; margin-bottom: 6px; }
+    .card-header p { font-size: 14px; color: var(--faint); }
 
-    .form-group {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      margin-bottom: 16px;
-    }
-    .form-group label { font-size: 14px; font-weight: bold; color: #333; }
+    .form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 18px; }
+    .form-group label { font-size: 13px; font-weight: 600; color: var(--text); }
     .form-group input {
-      padding: 10px 12px;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      font-size: 14px;
-      width: 100%;
+      padding: 11px 14px; border: 1.5px solid var(--border);
+      border-radius: 9px; font-size: 15px; font-family: inherit;
+      color: var(--text); background: var(--bg); width: 100%;
+      transition: border-color 0.15s;
     }
-    .form-group input:focus { outline: none; border-color: #1D9E75; }
+    .form-group input:focus { outline: none; border-color: var(--green); background: white; }
 
     .btn-primary {
-      width: 100%;
-      background: #1D9E75;
-      color: white;
-      border: none;
-      padding: 12px;
-      border-radius: 8px;
-      font-size: 15px;
-      cursor: pointer;
-      margin-top: 8px;
+      width: 100%; background: var(--green); color: white; border: none;
+      padding: 13px; border-radius: 9px; font-size: 15px; font-weight: 600;
+      cursor: pointer; margin-top: 4px; font-family: inherit; transition: background 0.15s;
     }
-    .btn-primary:hover { background: #085041; }
+    .btn-primary:hover { background: var(--green-dark); }
 
     .error-msg {
-      background: #FCEBEB;
-      color: #A32D2D;
-      padding: 10px 14px;
-      border-radius: 8px;
-      font-size: 13px;
-      margin-bottom: 16px;
+      background: #FEE2E2; color: #991B1B; padding: 11px 14px;
+      border-radius: 9px; font-size: 13px; margin-bottom: 20px; font-weight: 500;
     }
 
-    .toggle-text {
-      text-align: center;
-      margin-top: 20px;
-      font-size: 14px;
-      color: #888;
-    }
-    .toggle-text a { color: #1D9E75; text-decoration: none; font-weight: bold; }
+    .toggle-text { text-align: center; margin-top: 24px; font-size: 14px; color: var(--faint); }
+    .toggle-text a { color: var(--green); text-decoration: none; font-weight: 600; }
   </style>
 </head>
 <body>
 
   <div class="navbar">
-    <div class="logo">ቤት አግኝ · BetAgn</div>
+    <a href="/" class="logo">ቤት አግኝ · BetAgn</a>
     <a href="/" class="back-btn">← Back</a>
   </div>
 
@@ -93,12 +68,12 @@
     <div class="card">
 
       {% if mode == 'signup' %}
-      <h1>Create account</h1>
-      <p>Sign up to post your listings on BetAgn</p>
+      <div class="card-header">
+        <h1>Create account</h1>
+        <p>Sign up to post your listings on BetAgn</p>
+      </div>
 
-      {% if error %}
-      <div class="error-msg">{{ error }}</div>
-      {% endif %}
+      {% if error %}<div class="error-msg">{{ error }}</div>{% endif %}
 
       <form method="POST" action="/signup">
         <div class="form-group">
@@ -111,22 +86,20 @@
         </div>
         <div class="form-group">
           <label>Password</label>
-          <input type="password" name="password" placeholder="at least 6 characters" required>
+          <input type="password" name="password" placeholder="At least 6 characters" required>
         </div>
         <button type="submit" class="btn-primary">Create account</button>
       </form>
 
-      <div class="toggle-text">
-        Already have an account? <a href="/login">Login</a>
-      </div>
+      <div class="toggle-text">Already have an account? <a href="/login">Login</a></div>
 
       {% else %}
-      <h1>Welcome back</h1>
-      <p>Login to manage your listings</p>
+      <div class="card-header">
+        <h1>Welcome back</h1>
+        <p>Login to manage your listings</p>
+      </div>
 
-      {% if error %}
-      <div class="error-msg">{{ error }}</div>
-      {% endif %}
+      {% if error %}<div class="error-msg">{{ error }}</div>{% endif %}
 
       <form method="POST" action="/login">
         <div class="form-group">
@@ -140,9 +113,7 @@
         <button type="submit" class="btn-primary">Login</button>
       </form>
 
-      <div class="toggle-text">
-        Don't have an account? <a href="/signup">Sign up</a>
-      </div>
+      <div class="toggle-text">Don't have an account? <a href="/signup">Sign up</a></div>
 
       {% endif %}
 

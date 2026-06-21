@@ -5,151 +5,149 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Edit listing · Admin · BetAgn</title>
   <style>
+    :root {
+      --green: #15A17D; --green-dark: #0C6B52; --green-light: #E6F7F2;
+      --bg: #F7F6F3; --surface: #FFFFFF; --border: #E8EAed;
+      --text: #111827; --muted: #6B7280; --faint: #9CA3AF;
+      --shadow: 0 2px 12px rgba(0,0,0,0.07); --r: 14px;
+    }
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: Arial, sans-serif; background: #EDECE8; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); -webkit-font-smoothing: antialiased; }
 
     .navbar {
-      background: #085041;
-      padding: 14px 24px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+      background: #0A2E22; padding: 0 24px; height: 62px;
+      display: flex; align-items: center; justify-content: space-between;
     }
-    .logo { font-size: 20px; font-weight: bold; color: white; }
-    .back-btn { color: rgba(255,255,255,0.8); font-size: 14px; text-decoration: none; }
+    .logo { font-size: 17px; font-weight: 700; color: white; letter-spacing: -0.01em; }
+    .logo span { color: rgba(255,255,255,0.45); font-weight: 400; font-size: 13px; margin-left: 8px; }
+    .back-btn { font-size: 14px; color: rgba(255,255,255,0.6); text-decoration: none; font-weight: 500; }
+    .back-btn:hover { color: white; }
 
-    .form-container {
-      max-width: 600px;
-      margin: 32px auto;
-      background: white;
-      border-radius: 12px;
-      padding: 32px;
-      border: 1px solid #eee;
-    }
-    .form-container h1 { font-size: 22px; color: #111; margin-bottom: 24px; }
+    .form-container { max-width: 620px; margin: 32px auto 64px; padding: 0 16px; }
+    .form-card { background: var(--surface); border-radius: var(--r); padding: 36px 32px; box-shadow: var(--shadow); }
 
-    .form-group {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      margin-bottom: 18px;
-    }
-    .form-group label { font-size: 14px; font-weight: bold; color: #333; }
+    .form-header { margin-bottom: 28px; }
+    .form-header h1 { font-size: 22px; font-weight: 700; color: var(--text); letter-spacing: -0.02em; margin-bottom: 6px; }
+    .form-header p { font-size: 14px; color: var(--faint); }
+
+    .form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 20px; }
+    .form-group label { font-size: 13px; font-weight: 600; color: var(--text); }
     .form-group input,
     .form-group select,
     .form-group textarea {
-      padding: 10px 12px;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      font-size: 14px;
-      width: 100%;
-      font-family: Arial, sans-serif;
+      padding: 11px 14px; border: 1.5px solid var(--border);
+      border-radius: 9px; font-size: 15px; font-family: inherit;
+      color: var(--text); background: var(--bg); width: 100%;
     }
-    .form-group textarea { height: 100px; resize: vertical; }
+    .form-group textarea { height: 110px; resize: vertical; }
     .form-group input:focus,
     .form-group select:focus,
-    .form-group textarea:focus { outline: none; border-color: #1D9E75; }
+    .form-group textarea:focus { outline: none; border-color: var(--green); background: white; }
 
     .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    @media (max-width: 480px) { .form-row { grid-template-columns: 1fr; } }
+
+    .divider { height: 1px; background: var(--border); margin: 24px 0; }
 
     .submit-btn {
-      width: 100%;
-      background: #1D9E75;
-      color: white;
-      border: none;
-      padding: 14px;
-      border-radius: 8px;
-      font-size: 16px;
-      cursor: pointer;
-      margin-top: 8px;
+      width: 100%; background: var(--green); color: white; border: none;
+      padding: 14px; border-radius: 10px; font-size: 16px; font-weight: 600;
+      cursor: pointer; font-family: inherit;
     }
-    .submit-btn:hover { background: #085041; }
+    .submit-btn:hover { background: var(--green-dark); }
   </style>
 </head>
 <body>
 
   <div class="navbar">
-    <div class="logo">BetAgn Admin</div>
+    <div class="logo">BetAgn <span>Admin</span></div>
     <a href="/admin" class="back-btn">← Back to admin</a>
   </div>
 
   <div class="form-container">
-    <h1>Edit listing</h1>
-
-    <form method="POST" action="/admin/edit/{{ listing.id }}">
-
-      <div class="form-group">
-        <label>Property title</label>
-        <input type="text" name="title" value="{{ listing.title }}" required>
+    <div class="form-card">
+      <div class="form-header">
+        <h1>Edit listing</h1>
+        <p>Make changes and save. The listing status will not change.</p>
       </div>
 
-      <div class="form-row">
-        <div class="form-group">
-          <label>Property type</label>
-          <select name="type" required>
-            <option value="Apartment" {% if listing.type == 'Apartment' %}selected{% endif %}>Apartment</option>
-            <option value="House" {% if listing.type == 'House' %}selected{% endif %}>House</option>
-            <option value="Room" {% if listing.type == 'Room' %}selected{% endif %}>Room</option>
-            <option value="Villa" {% if listing.type == 'Villa' %}selected{% endif %}>Villa</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>Neighborhood</label>
-          <select name="neighborhood" required>
-            <option value="Kezira" {% if listing.neighborhood == 'Kezira' %}selected{% endif %}>Kezira</option>
-            <option value="Sabian" {% if listing.neighborhood == 'Sabian' %}selected{% endif %}>Sabian</option>
-            <option value="Legehare" {% if listing.neighborhood == 'Legehare' %}selected{% endif %}>Legehare</option>
-            <option value="Gendekore" {% if listing.neighborhood == 'Gendekore' %}selected{% endif %}>Gendekore</option>
-            <option value="Addis Ketema" {% if listing.neighborhood == 'Addis Ketema' %}selected{% endif %}>Addis Ketema</option>
-            <option value="Melka Jebdu" {% if listing.neighborhood == 'Melka Jebdu' %}selected{% endif %}>Melka Jebdu</option>
-          </select>
-        </div>
-      </div>
+      <form method="POST" action="/admin/edit/{{ listing.id }}">
 
-      <div class="form-row">
         <div class="form-group">
-          <label>Monthly rent (ETB)</label>
-          <input type="number" name="price" value="{{ listing.price }}" required>
+          <label>Property title</label>
+          <input type="text" name="title" value="{{ listing.title }}" required>
         </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Property type</label>
+            <select name="type" required>
+              <option value="Apartment" {% if listing.type == 'Apartment' %}selected{% endif %}>Apartment</option>
+              <option value="House" {% if listing.type == 'House' %}selected{% endif %}>House</option>
+              <option value="Room" {% if listing.type == 'Room' %}selected{% endif %}>Room</option>
+              <option value="Villa" {% if listing.type == 'Villa' %}selected{% endif %}>Villa</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Neighborhood</label>
+            <select name="neighborhood" required>
+              <option value="Kezira" {% if listing.neighborhood == 'Kezira' %}selected{% endif %}>Kezira</option>
+              <option value="Sabian" {% if listing.neighborhood == 'Sabian' %}selected{% endif %}>Sabian</option>
+              <option value="Legehare" {% if listing.neighborhood == 'Legehare' %}selected{% endif %}>Legehare</option>
+              <option value="Gendekore" {% if listing.neighborhood == 'Gendekore' %}selected{% endif %}>Gendekore</option>
+              <option value="Addis Ketema" {% if listing.neighborhood == 'Addis Ketema' %}selected{% endif %}>Addis Ketema</option>
+              <option value="Melka Jebdu" {% if listing.neighborhood == 'Melka Jebdu' %}selected{% endif %}>Melka Jebdu</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Monthly rent (ETB)</label>
+            <input type="number" name="price" value="{{ listing.price }}" required>
+          </div>
+          <div class="form-group">
+            <label>Size (m²)</label>
+            <input type="number" name="size" value="{{ listing.size }}">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Bedrooms</label>
+            <select name="bedrooms" required>
+              <option value="1" {% if listing.bedrooms == 1 %}selected{% endif %}>1</option>
+              <option value="2" {% if listing.bedrooms == 2 %}selected{% endif %}>2</option>
+              <option value="3" {% if listing.bedrooms == 3 %}selected{% endif %}>3</option>
+              <option value="4" {% if listing.bedrooms == 4 %}selected{% endif %}>4+</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Bathrooms</label>
+            <select name="bathrooms">
+              <option value="1" {% if listing.bathrooms == 1 %}selected{% endif %}>1</option>
+              <option value="2" {% if listing.bathrooms == 2 %}selected{% endif %}>2</option>
+              <option value="3" {% if listing.bathrooms == 3 %}selected{% endif %}>3+</option>
+            </select>
+          </div>
+        </div>
+
         <div class="form-group">
-          <label>Size (m²)</label>
-          <input type="number" name="size" value="{{ listing.size }}">
+          <label>Description</label>
+          <textarea name="description">{{ listing.description }}</textarea>
         </div>
-      </div>
 
-      <div class="form-row">
+        <div class="divider"></div>
+
         <div class="form-group">
-          <label>Bedrooms</label>
-          <select name="bedrooms" required>
-            <option value="1" {% if listing.bedrooms == 1 %}selected{% endif %}>1</option>
-            <option value="2" {% if listing.bedrooms == 2 %}selected{% endif %}>2</option>
-            <option value="3" {% if listing.bedrooms == 3 %}selected{% endif %}>3</option>
-            <option value="4" {% if listing.bedrooms == 4 %}selected{% endif %}>4+</option>
-          </select>
+          <label>Phone number</label>
+          <input type="text" name="phone" value="{{ listing.phone }}" required>
         </div>
-        <div class="form-group">
-          <label>Bathrooms</label>
-          <select name="bathrooms">
-            <option value="1" {% if listing.bathrooms == 1 %}selected{% endif %}>1</option>
-            <option value="2" {% if listing.bathrooms == 2 %}selected{% endif %}>2</option>
-            <option value="3" {% if listing.bathrooms == 3 %}selected{% endif %}>3+</option>
-          </select>
-        </div>
-      </div>
 
-      <div class="form-group">
-        <label>Description</label>
-        <textarea name="description">{{ listing.description }}</textarea>
-      </div>
+        <button type="submit" class="submit-btn">Save changes</button>
 
-      <div class="form-group">
-        <label>Phone number</label>
-        <input type="text" name="phone" value="{{ listing.phone }}" required>
-      </div>
-
-      <button type="submit" class="submit-btn">Save changes</button>
-
-    </form>
+      </form>
+    </div>
   </div>
 
 </body>

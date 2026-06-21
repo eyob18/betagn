@@ -5,229 +5,170 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ቤት አግኝ · BetAgn</title>
   <style>
+    :root {
+      --green: #15A17D;
+      --green-dark: #0C6B52;
+      --green-light: #E6F7F2;
+      --bg: #F7F6F3;
+      --surface: #FFFFFF;
+      --border: #E8EAed;
+      --text: #111827;
+      --muted: #6B7280;
+      --faint: #9CA3AF;
+      --shadow: 0 2px 12px rgba(0,0,0,0.07);
+      --shadow-hover: 0 6px 24px rgba(0,0,0,0.12);
+      --r: 14px;
+    }
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: Arial, sans-serif; background: #f5f5f5; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); -webkit-font-smoothing: antialiased; }
 
     .navbar {
-      background: white;
-      padding: 14px 16px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 1px solid #eee;
+      background: var(--surface);
+      padding: 0 24px;
+      height: 62px;
+      display: flex; align-items: center; justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+      position: sticky; top: 0; z-index: 100;
     }
-    .logo { font-size: 20px; font-weight: bold; color: #1D9E75; }
-    .nav-right { display: flex; align-items: center; gap: 8px; }
-    .nav-name { font-size: 13px; color: #333; font-weight: 500; }
-    .nav-btn {
-      background: #1D9E75;
-      color: white;
-      padding: 7px 14px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 14px;
-      text-decoration: none;
+    .logo { font-size: 17px; font-weight: 700; color: var(--green); letter-spacing: -0.01em; text-decoration: none; }
+    .nav-right { display: flex; align-items: center; gap: 10px; }
+    .nav-name { font-size: 13px; color: var(--text); font-weight: 500; }
+    .avatar-link { display: flex; align-items: center; gap: 8px; text-decoration: none; }
+    .avatar-sm {
+      width: 34px; height: 34px; border-radius: 50%;
+      background: var(--green); display: flex; align-items: center; justify-content: center;
+      color: white; font-size: 13px; font-weight: 700; flex-shrink: 0;
     }
-    @media (max-width: 480px) {
-      .nav-name { display: none; }
-      .nav-btn { padding: 7px 10px; font-size: 13px; }
+    .btn-nav-outline {
+      font-size: 13px; color: var(--green); text-decoration: none;
+      border: 1.5px solid var(--green); padding: 6px 14px; border-radius: 8px; font-weight: 500;
     }
+    .btn-nav {
+      background: var(--green); color: white; padding: 7px 16px;
+      border: none; border-radius: 8px; cursor: pointer;
+      font-size: 13px; text-decoration: none; font-weight: 600;
+    }
+    @media (max-width: 480px) { .nav-name { display: none; } }
 
     .hero {
-      background: #085041;
-      color: white;
-      text-align: center;
-      padding: 48px 24px;
+      background: linear-gradient(145deg, #082E22 0%, #0C5C43 100%);
+      color: white; text-align: center; padding: 56px 24px 76px;
     }
-    .hero h1 { font-size: 28px; margin-bottom: 8px; }
-    .hero p { color: #9FE1CB; margin-bottom: 24px; }
+    .hero h1 { font-size: 30px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 8px; line-height: 1.25; }
+    .hero p { color: rgba(255,255,255,0.6); font-size: 15px; }
 
+    .search-wrap { max-width: 620px; margin: -40px auto 32px; padding: 0 16px; position: relative; z-index: 10; }
     .search-box {
-      background: white;
-      border-radius: 12px;
-      padding: 20px;
-      max-width: 600px;
-      margin: 0 auto;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
+      background: var(--surface); border-radius: var(--r);
+      padding: 20px; box-shadow: 0 4px 28px rgba(0,0,0,0.14);
+      display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
     }
-    .search-box select,
-    .search-box input {
-      padding: 10px;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      font-size: 14px;
-      width: 100%;
+    .search-box select, .search-box input {
+      padding: 10px 12px; border: 1.5px solid var(--border);
+      border-radius: 8px; font-size: 14px; font-family: inherit;
+      color: var(--text); background: var(--bg); width: 100%;
     }
+    .search-box select:focus, .search-box input:focus { outline: none; border-color: var(--green); background: white; }
     .search-btn {
-      grid-column: span 2;
-      background: #1D9E75;
-      color: white;
-      border: none;
-      padding: 12px;
-      border-radius: 8px;
-      font-size: 15px;
-      cursor: pointer;
+      grid-column: span 2; background: var(--green); color: white;
+      border: none; padding: 12px; border-radius: 8px;
+      font-size: 15px; font-weight: 600; cursor: pointer; font-family: inherit;
     }
+    .search-btn:hover { background: var(--green-dark); }
 
-    .listings-section { padding: 24px; }
-    .listings-section h2 { margin-bottom: 16px; color: #333; }
-    .listings-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 16px;
-    }
+    .listings-section { padding: 0 20px 56px; max-width: 1200px; margin: 0 auto; }
+    .section-header { margin-bottom: 16px; }
+    .section-header h2 { font-size: 13px; font-weight: 600; color: var(--faint); text-transform: uppercase; letter-spacing: 0.05em; }
 
-    .card {
-      background: white;
-      border-radius: 12px;
-      overflow: hidden;
-      border: 1px solid #eee;
-    }
+    .listings-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 20px; }
+
+    .card { background: var(--surface); border-radius: var(--r); overflow: hidden; box-shadow: var(--shadow); transition: box-shadow 0.2s, transform 0.2s; }
+    .card:hover { box-shadow: var(--shadow-hover); transform: translateY(-2px); }
+
     .card-img {
-      height: 160px;
-      background: #E1F5EE;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #aaa;
-      font-size: 14px;
-      position: relative;
+      height: 190px; background: var(--green-light);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--faint); font-size: 13px; position: relative; overflow: hidden;
     }
-    .card-body { padding: 14px; }
-    .card-price { font-size: 20px; font-weight: bold; color: #111; }
-    .card-price span { font-size: 13px; font-weight: normal; color: #888; }
-    .card-title { color: #555; font-size: 14px; margin-top: 4px; }
-    .card-location { color: #999; font-size: 13px; margin-top: 4px; }
+    .type-badge {
+      position: absolute; top: 10px; left: 10px;
+      background: rgba(0,0,0,0.48); color: white;
+      font-size: 11px; font-weight: 600; padding: 3px 9px;
+      border-radius: 999px; backdrop-filter: blur(4px); letter-spacing: 0.02em;
+    }
+    .card-body { padding: 14px 16px 16px; }
+    .card-price { font-size: 21px; font-weight: 700; color: var(--text); letter-spacing: -0.02em; }
+    .card-price span { font-size: 13px; font-weight: 400; color: var(--muted); }
+    .card-title { color: var(--muted); font-size: 13px; margin-top: 3px; }
+    .card-location { color: var(--faint); font-size: 12px; margin-top: 3px; }
     .card-meta {
-      display: flex;
-      gap: 12px;
-      margin-top: 10px;
-      padding-top: 10px;
-      border-top: 1px solid #f0f0f0;
-      font-size: 12px;
-      color: #666;
+      display: flex; gap: 12px; margin-top: 12px; padding-top: 12px;
+      border-top: 1px solid var(--border); font-size: 12px; color: var(--muted); font-weight: 500;
     }
     .card-actions { display: flex; gap: 8px; margin-top: 12px; }
     .btn-whatsapp {
-      flex: 1;
-      background: #25D366;
-      color: white;
-      border: none;
-      padding: 8px;
-      border-radius: 8px;
-      font-size: 13px;
-      cursor: pointer;
+      flex: 1; background: #22C55E; color: white; border: none;
+      padding: 9px; border-radius: 8px; font-size: 13px; font-weight: 500;
+      cursor: pointer; font-family: inherit;
     }
     .btn-view {
-      flex: 1;
-      background: white;
-      border: 1px solid #ddd;
-      padding: 8px;
-      border-radius: 8px;
-      font-size: 13px;
-      cursor: pointer;
-      color: #555;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-decoration: none;
+      flex: 1; background: var(--bg); border: 1.5px solid var(--border);
+      padding: 9px; border-radius: 8px; font-size: 13px; font-weight: 500;
+      cursor: pointer; color: var(--text); display: flex; align-items: center;
+      justify-content: center; text-decoration: none;
     }
+    .btn-view:hover { border-color: var(--green); color: var(--green); }
 
-    .no-results {
-      text-align: center;
-      padding: 48px;
-      color: #888;
-    }
+    .no-results { grid-column: 1 / -1; text-align: center; padding: 72px 24px; color: var(--muted); }
+    .no-results h3 { font-size: 18px; margin-bottom: 8px; color: var(--text); font-weight: 600; }
 
-    .dots {
-      position: absolute;
-      bottom: 8px;
-      right: 8px;
-      display: flex;
-      gap: 4px;
-    }
-    .dot {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      background: rgba(255,255,255,0.5);
-      cursor: pointer;
-      border: 1px solid white;
-    }
+    .dots { position: absolute; bottom: 9px; left: 50%; transform: translateX(-50%); display: flex; gap: 5px; }
+    .dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,0.5); cursor: pointer; border: 1px solid white; }
     .dot.active { background: white; }
-
     .arrow {
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
-      background: rgba(0,0,0,0.4);
-      color: white;
-      border: none;
-      width: 28px;
-      height: 40px;
-      border-radius: 4px;
-      font-size: 22px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      position: absolute; top: 50%; transform: translateY(-50%);
+      background: rgba(0,0,0,0.35); color: white; border: none;
+      width: 28px; height: 40px; border-radius: 6px; font-size: 20px;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
     }
-    .arrow:hover { background: rgba(0,0,0,0.7); }
+    .arrow:hover { background: rgba(0,0,0,0.65); }
     .left-arrow { left: 6px; }
     .right-arrow { right: 6px; }
 
     .ribbon-btn {
-      position: absolute;
-      top: 0;
-      right: 10px;
-      width: 28px;
-      height: 40px;
-      cursor: pointer;
-      background: none;
-      border: none;
-      padding: 0;
-      z-index: 2;
+      position: absolute; top: 0; right: 10px; width: 26px; height: 38px;
+      cursor: pointer; background: none; border: none; padding: 0; z-index: 2;
+      filter: drop-shadow(0 1px 3px rgba(0,0,0,0.3));
     }
-    .ribbon-btn svg { width: 28px; height: 40px; display: block; }
+    .ribbon-btn svg { width: 26px; height: 38px; display: block; }
   </style>
 </head>
 <body>
 
-  <!-- Navigation -->
   <div class="navbar">
-    <div class="logo">ቤት አግኝ · BetAgn</div>
+    <a href="/" class="logo">ቤት አግኝ · BetAgn</a>
     {% if user %}
     <div class="nav-right">
-      <a href="/profile" style="display:flex; align-items:center; gap:6px; text-decoration:none;">
-        <div style="width:32px; height:32px; border-radius:50%; background:#1D9E75;
-          display:flex; align-items:center; justify-content:center;
-          color:white; font-size:13px; font-weight:bold; flex-shrink:0;">
-          {{ user.name[0].upper() }}
-        </div>
+      <a href="/profile" class="avatar-link">
+        <div class="avatar-sm">{{ user.name[0].upper() }}</div>
         <span class="nav-name">{{ user.name }}</span>
       </a>
-      <a href="/add" class="nav-btn">+ Post</a>
-   
+      <a href="/add" class="btn-nav">+ Post</a>
     </div>
     {% else %}
     <div class="nav-right">
-      <a href="/login"
-        style="font-size:14px; color:#1D9E75; text-decoration:none;
-        border:1px solid #1D9E75; padding:7px 12px; border-radius:8px;">
-        Login
-      </a>
-      <a href="/signup" class="nav-btn">Sign up</a>
+      <a href="/login" class="btn-nav-outline">Login</a>
+      <a href="/signup" class="btn-nav">Sign up</a>
     </div>
     {% endif %}
   </div>
 
-  <!-- Hero & Search -->
   <div class="hero">
     <h1>Find your home in Dire Dawa</h1>
     <p>Apartments, houses and rooms — search by area and price</p>
+  </div>
+
+  <div class="search-wrap">
     <form class="search-box" method="GET" action="/">
       <select name="neighborhood">
         <option value="">All neighborhoods</option>
@@ -239,26 +180,27 @@
         <option value="Melka Jebdu" {% if neighborhood == 'Melka Jebdu' %}selected{% endif %}>Melka Jebdu</option>
       </select>
       <select name="type">
-        <option value="">All property types</option>
+        <option value="">All types</option>
         <option value="Apartment" {% if property_type == 'Apartment' %}selected{% endif %}>Apartment</option>
         <option value="House" {% if property_type == 'House' %}selected{% endif %}>House</option>
         <option value="Room" {% if property_type == 'Room' %}selected{% endif %}>Room</option>
         <option value="Villa" {% if property_type == 'Villa' %}selected{% endif %}>Villa</option>
       </select>
-      <input type="number" name="max_price" placeholder="Max price in ETB" value="{{ max_price }}">
+      <input type="number" name="max_price" placeholder="Max price (ETB)" value="{{ max_price }}">
       <select name="bedrooms">
         <option value="">Bedrooms</option>
-        <option value="1" {% if bedrooms == '1' %}selected{% endif %}>1</option>
-        <option value="2" {% if bedrooms == '2' %}selected{% endif %}>2</option>
-        <option value="3+" {% if bedrooms == '3+' %}selected{% endif %}>3+</option>
+        <option value="1" {% if bedrooms == '1' %}selected{% endif %}>1 bed</option>
+        <option value="2" {% if bedrooms == '2' %}selected{% endif %}>2 beds</option>
+        <option value="3+" {% if bedrooms == '3+' %}selected{% endif %}>3+ beds</option>
       </select>
       <button class="search-btn" type="submit">Search listings</button>
     </form>
   </div>
 
-  <!-- Listings -->
   <div class="listings-section">
-    <h2>{{ total }} listing{{ 's' if total != 1 else '' }} found</h2>
+    <div class="section-header">
+      <h2>{{ total }} listing{{ 's' if total != 1 else '' }} found</h2>
+    </div>
     <div class="listings-grid">
 
       {% if listings %}
@@ -266,22 +208,22 @@
         {% set photos = listing.photo_urls if listing.get('photo_urls') else ([listing.photo_url] if listing.get('photo_url') else []) %}
         <div class="card">
           <div class="card-img" id="card-{{ loop.index0 }}">
+            <span class="type-badge">{{ listing.type }}</span>
             {% if user %}
             {% set is_saved = listing.id in bookmarked_ids %}
             <button class="ribbon-btn" id="ribbon-{{ listing.id }}"
               onclick="toggleBookmark('{{ listing.id }}')" title="Save listing">
-              <svg viewBox="0 0 28 40" xmlns="http://www.w3.org/2000/svg">
+              <svg viewBox="0 0 26 38" xmlns="http://www.w3.org/2000/svg">
                 <polygon id="ribbon-poly-{{ listing.id }}"
-                  points="0,0 28,0 28,40 14,28 0,40"
-                  fill="{{ '#1D9E75' if is_saved else 'white' }}"
-                  stroke="#1D9E75" stroke-width="2"
+                  points="0,0 26,0 26,38 13,27 0,38"
+                  fill="{{ '#15A17D' if is_saved else 'white' }}"
+                  stroke="#15A17D" stroke-width="2"
                   style="transition: fill 0.2s;"/>
               </svg>
             </button>
             {% endif %}
             {% if photos %}
-            <img src="{{ photos[0] }}"
-              alt="{{ listing.title }}"
+            <img src="{{ photos[0] }}" alt="{{ listing.title }}"
               style="width:100%; height:100%; object-fit:cover; cursor:pointer;"
               onclick="openLightbox({{ photos | tojson }}, 0)">
             {% if photos|length > 1 %}
@@ -292,8 +234,7 @@
               {% for url in photos %}
               <div class="dot {% if loop.first %}active{% endif %}"
                 data-url="{{ url }}"
-                onclick="switchPhoto(this, '{{ url }}', '{{ card_id }}')">
-              </div>
+                onclick="switchPhoto(this, '{{ url }}', '{{ card_id }}')"></div>
               {% endfor %}
             </div>
             {% endif %}
@@ -304,10 +245,7 @@
           <div class="card-body">
             <div class="card-price">{{ listing.price }} ETB <span>/ month</span></div>
             <div class="card-title">{{ listing.title }}</div>
-            <div class="card-location">📍 {{ listing.neighborhood }}, Dire Dawa</div>
-            {% if listing.created_at %}
-            <div style="font-size:12px; color:#bbb; margin-top:3px;">🕐 Posted {{ listing.created_at | time_ago }}</div>
-            {% endif %}
+            <div class="card-location">📍 {{ listing.neighborhood }}{% if listing.created_at %} · <span style="font-size:11px;">{{ listing.created_at | time_ago }}</span>{% endif %}</div>
             <div class="card-meta">
               <span>🛏 {{ listing.bedrooms }} bed</span>
               <span>📐 {{ listing.size }}m²</span>
@@ -324,16 +262,15 @@
       {% else %}
         <div class="no-results">
           <h3>No listings found</h3>
-          <p>Try changing your search filters</p>
+          <p>Try adjusting your filters</p>
         </div>
       {% endif %}
 
     </div>
   </div>
 
-  <!-- Pagination -->
   {% if total_pages > 1 %}
-  <div style="display:flex; justify-content:center; align-items:center; gap:12px; padding:24px 16px 32px;">
+  <div style="display:flex; justify-content:center; align-items:center; gap:12px; padding:0 16px 56px;">
     {% set params = [] %}
     {% if neighborhood %}{% set _ = params.append('neighborhood=' ~ neighborhood) %}{% endif %}
     {% if property_type %}{% set _ = params.append('type=' ~ property_type) %}{% endif %}
@@ -343,54 +280,39 @@
 
     {% if page > 1 %}
     <a href="/?{{ base_qs }}{% if base_qs %}&{% endif %}page={{ page - 1 }}"
-      style="padding:9px 20px; border:1px solid #ddd; border-radius:8px;
-      color:#333; text-decoration:none; font-size:14px; background:white;">
-      ← Prev
-    </a>
+      style="padding:9px 22px; border:1.5px solid var(--border); border-radius:8px;
+      color:var(--text); text-decoration:none; font-size:14px; font-weight:500; background:var(--surface);">← Prev</a>
     {% else %}
-    <span style="padding:9px 20px; border:1px solid #eee; border-radius:8px;
-      color:#ccc; font-size:14px; background:white; cursor:default;">
-      ← Prev
-    </span>
+    <span style="padding:9px 22px; border:1.5px solid var(--border); border-radius:8px;
+      color:var(--faint); font-size:14px; background:var(--surface);">← Prev</span>
     {% endif %}
 
-    <span style="font-size:14px; color:#888;">Page {{ page }} of {{ total_pages }}</span>
+    <span style="font-size:14px; color:var(--muted); font-weight:500;">{{ page }} / {{ total_pages }}</span>
 
     {% if page < total_pages %}
     <a href="/?{{ base_qs }}{% if base_qs %}&{% endif %}page={{ page + 1 }}"
-      style="padding:9px 20px; border:1px solid #ddd; border-radius:8px;
-      color:#333; text-decoration:none; font-size:14px; background:white;">
-      Next →
-    </a>
+      style="padding:9px 22px; border:1.5px solid var(--border); border-radius:8px;
+      color:var(--text); text-decoration:none; font-size:14px; font-weight:500; background:var(--surface);">Next →</a>
     {% else %}
-    <span style="padding:9px 20px; border:1px solid #eee; border-radius:8px;
-      color:#ccc; font-size:14px; background:white; cursor:default;">
-      Next →
-    </span>
+    <span style="padding:9px 22px; border:1.5px solid var(--border); border-radius:8px;
+      color:var(--faint); font-size:14px; background:var(--surface);">Next →</span>
     {% endif %}
   </div>
   {% endif %}
 
-  <!-- Lightbox -->
   <div id="lightbox"
     style="display:none; position:fixed; top:0; left:0; width:100%; height:100%;
-    background:rgba(0,0,0,0.9); z-index:1000; align-items:center;
-    justify-content:center;">
+    background:rgba(0,0,0,0.93); z-index:1000; align-items:center; justify-content:center;">
     <div onclick="closeLightbox()"
-      style="position:absolute; top:16px; right:20px; color:white; font-size:32px;
-      cursor:pointer;">✕</div>
+      style="position:absolute; top:18px; right:22px; color:white; font-size:26px; cursor:pointer; line-height:1;">✕</div>
     <div onclick="lightboxPrev()"
-      style="position:absolute; left:16px; color:white; font-size:56px;
-      cursor:pointer; user-select:none;">&#8249;</div>
+      style="position:absolute; left:16px; color:white; font-size:52px; cursor:pointer; user-select:none;">&#8249;</div>
     <img id="lightbox-img" src="" alt="Property photo"
-      style="max-width:85%; max-height:85%; border-radius:8px;">
+      style="max-width:88%; max-height:88%; border-radius:10px; object-fit:contain;">
     <div onclick="lightboxNext()"
-      style="position:absolute; right:16px; color:white; font-size:56px;
-      cursor:pointer; user-select:none;">&#8250;</div>
+      style="position:absolute; right:16px; color:white; font-size:52px; cursor:pointer; user-select:none;">&#8250;</div>
     <div id="lightbox-dots"
-      style="position:absolute; bottom:20px; left:50%; transform:translateX(-50%);
-      display:flex; gap:8px;">
-    </div>
+      style="position:absolute; bottom:22px; left:50%; transform:translateX(-50%); display:flex; gap:8px;"></div>
   </div>
 
   <script>
@@ -398,49 +320,30 @@
     let currentPhotoIndex = 0;
 
     function openLightbox(urls, index) {
-      currentPhotos = urls;
-      currentPhotoIndex = index;
+      currentPhotos = urls; currentPhotoIndex = index;
       updateLightbox();
       document.getElementById('lightbox').style.display = 'flex';
     }
-
     function updateLightbox() {
       document.getElementById('lightbox-img').src = currentPhotos[currentPhotoIndex];
       const dotsContainer = document.getElementById('lightbox-dots');
       dotsContainer.innerHTML = '';
       currentPhotos.forEach((url, i) => {
         const dot = document.createElement('div');
-        dot.style.cssText = `width:10px; height:10px; border-radius:50%; cursor:pointer;
-          border:1px solid white;
-          background:${i === currentPhotoIndex ? 'white' : 'rgba(255,255,255,0.4)'};`;
+        dot.style.cssText = `width:8px;height:8px;border-radius:50%;cursor:pointer;border:1px solid white;background:${i===currentPhotoIndex?'white':'rgba(255,255,255,0.4)'};`;
         dot.onclick = () => { currentPhotoIndex = i; updateLightbox(); };
         dotsContainer.appendChild(dot);
       });
     }
-
-    function lightboxNext() {
-      currentPhotoIndex = (currentPhotoIndex + 1) % currentPhotos.length;
-      updateLightbox();
-    }
-
-    function lightboxPrev() {
-      currentPhotoIndex = (currentPhotoIndex - 1 + currentPhotos.length) % currentPhotos.length;
-      updateLightbox();
-    }
-
-    function closeLightbox() {
-      document.getElementById('lightbox').style.display = 'none';
-    }
-
-    document.getElementById('lightbox').addEventListener('click', function(e) {
-      if (e.target === this) closeLightbox();
-    });
-
+    function lightboxNext() { currentPhotoIndex = (currentPhotoIndex+1)%currentPhotos.length; updateLightbox(); }
+    function lightboxPrev() { currentPhotoIndex = (currentPhotoIndex-1+currentPhotos.length)%currentPhotos.length; updateLightbox(); }
+    function closeLightbox() { document.getElementById('lightbox').style.display = 'none'; }
+    document.getElementById('lightbox').addEventListener('click', function(e) { if(e.target===this) closeLightbox(); });
     document.addEventListener('keydown', function(e) {
-      if (document.getElementById('lightbox').style.display === 'flex') {
-        if (e.key === 'ArrowRight') lightboxNext();
-        if (e.key === 'ArrowLeft') lightboxPrev();
-        if (e.key === 'Escape') closeLightbox();
+      if(document.getElementById('lightbox').style.display==='flex') {
+        if(e.key==='ArrowRight') lightboxNext();
+        if(e.key==='ArrowLeft') lightboxPrev();
+        if(e.key==='Escape') closeLightbox();
       }
     });
 
@@ -450,15 +353,21 @@
       card.querySelectorAll('.dot').forEach(d => d.classList.remove('active'));
       dot.classList.add('active');
     }
-
     function nextPhoto(cardId) {
       const card = document.getElementById(cardId);
       const dots = card.querySelectorAll('.dot');
-      let activeIndex = 0;
-      dots.forEach((dot, i) => { if (dot.classList.contains('active')) activeIndex = i; });
-      let newIndex = (activeIndex + 1) % dots.length;
-      const newDot = dots[newIndex];
-      switchPhoto(newDot, newDot.getAttribute('data-url'), cardId);
+      let ai = 0;
+      dots.forEach((d,i) => { if(d.classList.contains('active')) ai=i; });
+      const nd = dots[(ai+1)%dots.length];
+      switchPhoto(nd, nd.getAttribute('data-url'), cardId);
+    }
+    function prevPhoto(cardId) {
+      const card = document.getElementById(cardId);
+      const dots = card.querySelectorAll('.dot');
+      let ai = 0;
+      dots.forEach((d,i) => { if(d.classList.contains('active')) ai=i; });
+      const nd = dots[(ai-1+dots.length)%dots.length];
+      switchPhoto(nd, nd.getAttribute('data-url'), cardId);
     }
 
     function toggleBookmark(listingId) {
@@ -466,18 +375,8 @@
         .then(r => r.json())
         .then(data => {
           const poly = document.getElementById(`ribbon-poly-${listingId}`);
-          poly.setAttribute('fill', data.bookmarked ? '#1D9E75' : 'white');
+          poly.setAttribute('fill', data.bookmarked ? '#15A17D' : 'white');
         });
-    }
-
-    function prevPhoto(cardId) {
-      const card = document.getElementById(cardId);
-      const dots = card.querySelectorAll('.dot');
-      let activeIndex = 0;
-      dots.forEach((dot, i) => { if (dot.classList.contains('active')) activeIndex = i; });
-      let newIndex = (activeIndex - 1 + dots.length) % dots.length;
-      const newDot = dots[newIndex];
-      switchPhoto(newDot, newDot.getAttribute('data-url'), cardId);
     }
   </script>
 
